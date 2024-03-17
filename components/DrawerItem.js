@@ -19,6 +19,15 @@ class DrawerItem extends React.Component {
             color={focused ? "white" : argonTheme.COLORS.PRIMARY}
           />
         );
+      case "MealPlanner":
+        return (
+          <Icon
+            name="shop"
+            family="ArgonExtra"
+            size={14}
+            color={focused ? "white" : argonTheme.COLORS.PRIMARY}
+          />
+        );
       case "Elements":
         return (
           <Icon
@@ -56,12 +65,14 @@ class DrawerItem extends React.Component {
           />
         );
       case "Getting Started":
-        return (<Icon
-          name="spaceship"
-          family="ArgonExtra"
-          size={14}
-          color={focused ? "white" : "rgba(0,0,0,0.5)"}
-        />);
+        return (
+          <Icon
+            name="spaceship"
+            family="ArgonExtra"
+            size={14}
+            color={focused ? "white" : "rgba(0,0,0,0.5)"}
+          />
+        );
       case "Log out":
         return <Icon />;
       default:
@@ -84,7 +95,7 @@ class DrawerItem extends React.Component {
           title == "Getting Started"
             ? Linking.openURL(
                 "https://demos.creative-tim.com/argon-pro-react-native/docs/"
-              ).catch(err => console.error("An error occurred", err))
+              ).catch((err) => console.error("An error occurred", err))
             : navigation.navigate(title)
         }
       >

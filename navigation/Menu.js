@@ -13,7 +13,14 @@ function CustomDrawerContent({
   state,
   ...rest
 }) {
-  const screens = ["Home", "Profile", "Account", "Elements", "Articles"];
+  const screens = [
+    "Home",
+    "Profile",
+    "Account",
+    "Elements",
+    "Articles",
+    "MealPlanner"
+  ];
   return (
     <Block
       style={styles.container}
@@ -42,7 +49,7 @@ function CustomDrawerContent({
               style={{
                 borderColor: "rgba(0,0,0,0.2)",
                 width: "100%",
-                borderWidth: StyleSheet.hairlineWidth,
+                borderWidth: StyleSheet.hairlineWidth
               }}
             />
             <Text color="#8898AA" style={{ marginTop: 16, marginLeft: 8 }}>
@@ -58,14 +65,14 @@ function CustomDrawerContent({
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
+    flex: 1
   },
   header: {
     paddingHorizontal: 28,
     paddingBottom: theme.SIZES.BASE,
     paddingTop: theme.SIZES.BASE * 3,
-    justifyContent: "center",
-  },
+    justifyContent: "center"
+  }
 });
 
 export default CustomDrawerContent;

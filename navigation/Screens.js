@@ -19,6 +19,7 @@ import Register from "../screens/Register";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { createDrawerNavigator } from "@react-navigation/drawer";
 import { createStackNavigator } from "@react-navigation/stack";
+import LogIn from "../screens/LogIn";
 
 const { width } = Dimensions.get("screen");
 
@@ -255,6 +256,22 @@ export default function OnboardingStack(props) {
         option={{
           headerTransparent: true
         }}
+      />
+      <Drawer.Screen
+        name="Register"
+        component={Register}
+        options={{
+          headerShown: false
+        }}
+        initialParams={{ navigation: props.navigation }}
+      />
+      <Drawer.Screen
+        name="LogIn"
+        component={LogIn}
+        options={{
+          headerShown: false
+        }}
+        initialParams={{ navigation: props.navigation }}
       />
       <Stack.Screen name="App" component={AppStack} />
     </Stack.Navigator>

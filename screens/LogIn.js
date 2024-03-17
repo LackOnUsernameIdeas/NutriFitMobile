@@ -7,19 +7,15 @@ import {
   KeyboardAvoidingView,
   TouchableOpacity
 } from "react-native";
-import { Block, Text } from "galio-framework";
+import { Block, Checkbox, Text, theme } from "galio-framework";
 import { Button, Icon, Input } from "../components";
 import { Images, argonTheme } from "../constants";
 import firebase from "firebase/app";
-import {
-  getAuth,
-  createUserWithEmailAndPassword,
-  signInWithEmailAndPassword
-} from "firebase/auth";
+import { getAuth, signInWithEmailAndPassword } from "firebase/auth";
 
 const { width, height } = Dimensions.get("screen");
 
-class Register extends React.Component {
+class LogIn extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -29,65 +25,42 @@ class Register extends React.Component {
     };
   }
 
-  handleSignUp = () => {
+  handleSignIn = () => {
     const { email, password } = this.state;
     const auth = getAuth();
-
-    createUserWithEmailAndPassword(auth, email, password)
+    signInWithEmailAndPassword(auth, email, password)
       .then(() => {
-        // Handle successful registration
-        console.log("User registered successfully!");
-
-        // Now let's log in the user
-        signInWithEmailAndPassword(auth, email, password)
-          .then(() => {
-            // Handle successful sign-in
-            console.log("User logged in successfully!");
-            // Redirect the user to the app
-            this.props.navigation.navigate("App");
-          })
-          .catch((error) => {
-            // Handle sign-in errors
-            console.error("Error signing in after registration:", error);
-            // You might want to display an error message to the user here
-          });
+        // Handle successful sign-in
+        console.log("User signed in successfully!");
+        this.props.navigation.navigate("App");
       })
       .catch((error) => {
-        // Handle registration errors
+        // Handle sign-in errors
         let errorMessage;
         switch (error.code) {
           case "auth/invalid-email":
-            errorMessage =
-              "Email-ът ви е невалиден. Проверете за грешки в изписването.";
+            errorMessage = "Невалиден email. Проверете го и опитайте отново.";
             break;
-          case "auth/weak-password":
-            errorMessage = "Паролата ви е твърде слаба.";
+          case "auth/user-not-found":
+            errorMessage = "Потребителят не е намерен. Регистрирайте се първо.";
             break;
-          case "auth/email-already-exists":
-            errorMessage =
-              "Този еmail е регистриран. Да не би да искахте да влезете в профила ви?";
-            break;
-          case "auth/invalid-password":
-            errorMessage = "Паролата ви не е правилна.";
-            break;
-          case "auth/missing-password":
-            errorMessage = "Моля напишете вашата парола.";
-            break;
-          case "auth/email-already-in-use":
-            errorMessage =
-              "Този еmail е регистриран. Да не би да искахте да влезете в профила ви?";
-            break;
-          case "auth/weak-password":
-            errorMessage = "Паролата ви трябва да бъде поне 6 символа.";
+          case "auth/wrong-password":
+            errorMessage = "Грешна парола. Опитайте отново.";
             break;
           case "auth/missing-email":
-            errorMessage = "Моля напишете вашия еmail.";
+            errorMessage = "Моля, въведете вашето имейл адрес.";
+            break;
+          case "auth/missing-password":
+            errorMessage = "Моля, въведете вашата парола.";
+            break;
+          case "auth/invalid-credential":
+            errorMessage = "Не сте въвели правилни данни. Опитайте отново.";
             break;
           default:
-            errorMessage = "Грешка се случи: " + error.message;
+            errorMessage = "Грешка: " + error.message;
         }
         this.setState({ errorMessage });
-        console.error("Error registering user:", error);
+        console.error("Error signing in:", error);
       });
   };
 
@@ -117,7 +90,7 @@ class Register extends React.Component {
               <Block flex>
                 <Block flex={0.17} middle>
                   <Text color="#8898AA" size={12}>
-                    Създадете профил
+                    Влезте във Вашият профил
                   </Text>
                 </Block>
                 <Block flex center>
@@ -194,14 +167,14 @@ class Register extends React.Component {
                         <Button
                           color="primary"
                           style={styles.createButton}
-                          onPress={this.handleSignUp}
+                          onPress={this.handleSignIn}
                         >
                           <Text bold size={14} color={argonTheme.COLORS.WHITE}>
-                            Създай профил
+                            Влезте в профила
                           </Text>
                         </Button>
                         <TouchableOpacity
-                          onPress={() => navigation.navigate("LogIn")}
+                          onPress={() => navigation.navigate("Register")}
                         >
                           <Text
                             style={{
@@ -209,7 +182,7 @@ class Register extends React.Component {
                               color: argonTheme.COLORS.PRIMARY
                             }}
                           >
-                            Вече имате профил? Натиснете тук!
+                            Нямате профил? Натиснете тук!
                           </Text>
                         </TouchableOpacity>
                       </Block>
@@ -288,4 +261,4 @@ const styles = StyleSheet.create({
   }
 });
 
-export default Register;
+export default LogIn;

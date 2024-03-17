@@ -5,7 +5,8 @@ import * as Font from "expo-font";
 import { Asset } from "expo-asset";
 import { Block, GalioProvider } from "galio-framework";
 import { NavigationContainer } from "@react-navigation/native";
-
+import firebaseConfig from "./database/config";
+import { initializeApp } from "firebase/app";
 // Before rendering any navigation stack
 import { enableScreens } from "react-native-screens";
 enableScreens();
@@ -21,7 +22,7 @@ const assetImages = [
   Images.Pro,
   Images.ArgonLogo,
   Images.iOSLogo,
-  Images.androidLogo,
+  Images.androidLogo
 ];
 // cache product images
 articles.map((article) => assetImages.push(article.image));
@@ -42,11 +43,13 @@ export default function App() {
   useEffect(() => {
     async function prepare() {
       try {
-        //Load Resources
+        // Initialize Firebase app
+        initializeApp(firebaseConfig);
+        // Load Resources
         await _loadResourcesAsync();
         // Pre-load fonts, make any API calls you need to do here
         await Font.loadAsync({
-          ArgonExtra: require("./assets/font/argon.ttf"),
+          ArgonExtra: require("./assets/font/argon.ttf")
         });
       } catch (e) {
         console.warn(e);

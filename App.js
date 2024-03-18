@@ -7,6 +7,9 @@ import { Block, GalioProvider } from "galio-framework";
 import { NavigationContainer } from "@react-navigation/native";
 import firebaseConfig from "./database/config";
 import { initializeApp } from "firebase/app";
+import { initializeAuth, getReactNativePersistence } from "firebase/auth";
+import ReactNativeAsyncStorage from "@react-native-async-storage/async-storage";
+
 // Before rendering any navigation stack
 import { enableScreens } from "react-native-screens";
 enableScreens();
@@ -44,7 +47,10 @@ export default function App() {
     async function prepare() {
       try {
         // Initialize Firebase app
-        initializeApp(firebaseConfig);
+        const app = initializeApp(firebaseConfig);
+        const auth = initializeAuth(app, {
+          persistence: getReactNativePersistence(ReactNativeAsyncStorage)
+        });
         // Load Resources
         await _loadResourcesAsync();
         // Pre-load fonts, make any API calls you need to do here

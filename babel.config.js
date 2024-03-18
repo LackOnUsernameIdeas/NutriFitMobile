@@ -6,10 +6,16 @@ module.exports = function (api) {
       [
         "module-resolver",
         {
-          extensions: [".tsx", ".ts", ".js", ".json"],
-        },
+          extensions: [".tsx", ".ts", ".js", ".json"]
+        }
       ],
-      "react-native-reanimated/plugin",
-    ],
+      [
+        "module:react-native-dotenv",
+        {
+          moduleName: "@env"
+        }
+      ],
+      "react-native-reanimated/plugin"
+    ]
   };
 };

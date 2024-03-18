@@ -2,7 +2,7 @@ import { Animated, Dimensions, Easing } from "react-native";
 // header for screens
 import { Header, Icon } from "../components";
 import { argonTheme, tabs } from "../constants";
-
+import React, { useEffect, useState } from "react"; // Add this line
 import Articles from "../screens/Articles";
 import { Block } from "galio-framework";
 // drawer
@@ -14,12 +14,12 @@ import MealPlanner from "../screens/MealPlanner";
 import Onboarding from "../screens/Onboarding";
 import Pro from "../screens/Pro";
 import Profile from "../screens/Profile";
-import React from "react";
 import Register from "../screens/Register";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { createDrawerNavigator } from "@react-navigation/drawer";
 import { createStackNavigator } from "@react-navigation/stack";
 import LogIn from "../screens/LogIn";
+import { getAuth, onAuthStateChanged } from "firebase/auth";
 
 const { width } = Dimensions.get("screen");
 
@@ -243,6 +243,20 @@ function MealPlannerStack(props) {
 }
 
 export default function OnboardingStack(props) {
+  const [initializing, setInitializing] = useState(true);
+  const [user, setUser] = useState(null);
+
+  useEffect(() => {
+    const auth = getAuth();
+    const subscriber = onAuthStateChanged(auth, (user) => {
+      setUser(user);
+      if (initializing) setInitializing(false);
+    });
+    return subscriber;
+  }, [initializing]);
+
+  if (initializing) return null;
+
   return (
     <Stack.Navigator
       screenOptions={{
@@ -250,30 +264,35 @@ export default function OnboardingStack(props) {
         headerShown: false
       }}
     >
-      <Stack.Screen
-        name="Onboarding"
-        component={Onboarding}
-        option={{
-          headerTransparent: true
-        }}
-      />
-      <Drawer.Screen
-        name="Register"
-        component={Register}
-        options={{
-          headerShown: false
-        }}
-        initialParams={{ navigation: props.navigation }}
-      />
-      <Drawer.Screen
-        name="LogIn"
-        component={LogIn}
-        options={{
-          headerShown: false
-        }}
-        initialParams={{ navigation: props.navigation }}
-      />
-      <Stack.Screen name="App" component={AppStack} />
+      {!user ? (
+        <>
+          <Stack.Screen
+            name="Onboarding"
+            component={Onboarding}
+            option={{
+              headerTransparent: true
+            }}
+          />
+          <Stack.Screen
+            name="Register"
+            component={Register}
+            options={{
+              headerShown: false
+            }}
+            initialParams={{ navigation: props.navigation }}
+          />
+          <Stack.Screen
+            name="LogIn"
+            component={LogIn}
+            options={{
+              headerShown: false
+            }}
+            initialParams={{ navigation: props.navigation }}
+          />
+        </>
+      ) : (
+        <Stack.Screen name="App" component={AppStack} />
+      )}
     </Stack.Navigator>
   );
 }

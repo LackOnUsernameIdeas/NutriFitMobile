@@ -10,7 +10,6 @@ import {
 import { Block, Text } from "galio-framework";
 import { Button, Icon, Input } from "../components";
 import { Images, argonTheme } from "../constants";
-import firebase from "firebase/app";
 import {
   getAuth,
   createUserWithEmailAndPassword,

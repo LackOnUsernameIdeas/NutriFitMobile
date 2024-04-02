@@ -20,6 +20,8 @@ import { createDrawerNavigator } from "@react-navigation/drawer";
 import { createStackNavigator } from "@react-navigation/stack";
 import LogIn from "../screens/LogIn";
 import { getAuth, onAuthStateChanged } from "firebase/auth";
+import UserMeasurements from "../screens/UserMeasurements";
+import { fetchAdditionalUserData } from "../database/getFunctions";
 
 const { width } = Dimensions.get("screen");
 
@@ -245,11 +247,20 @@ function MealPlannerStack(props) {
 export default function OnboardingStack(props) {
   const [initializing, setInitializing] = useState(true);
   const [user, setUser] = useState(null);
+  const [hasMeasurementsForToday, setHasMeasurementsForToday] = useState(false);
 
   useEffect(() => {
     const auth = getAuth();
-    const subscriber = onAuthStateChanged(auth, (user) => {
+    const subscriber = onAuthStateChanged(auth, async (user) => {
       setUser(user);
+      if (user) {
+        // Fetch additional user data and set hasMeasurementsForToday
+        const userData = await fetchAdditionalUserData(user.uid);
+        const userDocKey = new Date().toISOString().slice(0, 10);
+        if (userData[userDocKey]) {
+          setHasMeasurementsForToday(true);
+        }
+      }
       if (initializing) setInitializing(false);
     });
     return subscriber;
@@ -291,7 +302,20 @@ export default function OnboardingStack(props) {
           />
         </>
       ) : (
-        <Stack.Screen name="App" component={AppStack} />
+        <>
+          {!hasMeasurementsForToday ? (
+            <Stack.Screen
+              name="UserMeasurements"
+              component={UserMeasurements}
+              options={{
+                headerShown: false
+              }}
+              initialParams={{ navigation: props.navigation }}
+            />
+          ) : (
+            <Stack.Screen name="App" component={AppStack} />
+          )}
+        </>
       )}
     </Stack.Navigator>
   );

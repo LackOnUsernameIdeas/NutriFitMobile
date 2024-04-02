@@ -5,11 +5,9 @@ import * as Font from "expo-font";
 import { Asset } from "expo-asset";
 import { Block, GalioProvider } from "galio-framework";
 import { NavigationContainer } from "@react-navigation/native";
-import firebaseConfig from "./database/config";
-import { initializeApp } from "firebase/app";
 import { initializeAuth, getReactNativePersistence } from "firebase/auth";
 import ReactNativeAsyncStorage from "@react-native-async-storage/async-storage";
-
+import { app } from "./database/connection";
 // Before rendering any navigation stack
 import { enableScreens } from "react-native-screens";
 enableScreens();
@@ -46,8 +44,6 @@ export default function App() {
   useEffect(() => {
     async function prepare() {
       try {
-        // Initialize Firebase app
-        const app = initializeApp(firebaseConfig);
         const auth = initializeAuth(app, {
           persistence: getReactNativePersistence(ReactNativeAsyncStorage)
         });

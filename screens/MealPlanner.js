@@ -621,7 +621,7 @@ const styles = StyleSheet.create({
   },
   inputContainer: {
     paddingHorizontal: 20,
-    paddingTop: 20, // Add padding to create space between the top of the container and the first input field
+    paddingTop: 20,
     paddingBottom: 20
   },
   input: {
@@ -634,15 +634,15 @@ const styles = StyleSheet.create({
   buttonContainer: {
     flexDirection: "row",
     justifyContent: "space-between",
-    marginHorizontal: 20, // Adjust the margin between the input fields and buttons
-    marginBottom: 20 // Add margin to separate the buttons from the input fields
+    marginHorizontal: 20,
+    marginBottom: 20
   },
   button: {
     flex: 1,
     backgroundColor: "blue",
     borderRadius: 10,
     justifyContent: "center",
-    marginHorizontal: 5 // Adjust the horizontal margin of each button
+    marginHorizontal: 5
   },
   buttonText: {
     color: "white",

@@ -254,7 +254,6 @@ export default function OnboardingStack(props) {
     const subscriber = onAuthStateChanged(auth, async (user) => {
       setUser(user);
       if (user) {
-        // Fetch additional user data and set hasMeasurementsForToday
         const userData = await fetchAdditionalUserData(user.uid);
         const userDocKey = new Date().toISOString().slice(0, 10);
         if (userData[userDocKey]) {

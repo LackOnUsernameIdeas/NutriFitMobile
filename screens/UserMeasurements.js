@@ -54,7 +54,8 @@ class UserMeasurements extends React.Component {
         {
           method: "POST",
           headers: {
-            "Content-Type": "application/json"
+            "Content-Type": "application/json",
+            "x-api-key": "349f35fa-fafc-41b9-89ed-ff19addc3494"
           },
           body: JSON.stringify({
             height: height,
@@ -93,7 +94,8 @@ class UserMeasurements extends React.Component {
         {
           method: "POST",
           headers: {
-            "Content-Type": "application/json"
+            "Content-Type": "application/json",
+            "x-api-key": "349f35fa-fafc-41b9-89ed-ff19addc3494"
           },
           body: JSON.stringify({
             height: height,
@@ -123,7 +125,7 @@ class UserMeasurements extends React.Component {
 
       if (saveResult) {
         this.triggerFetchAndSaveAllData();
-        this.props.navigation.navigate("App");
+        this.props.navigation.navigate("Home");
       }
     } catch (error) {
       console.error("Error generating stats:", error);
@@ -174,7 +176,8 @@ class UserMeasurements extends React.Component {
         {
           method: "POST",
           headers: {
-            "Content-Type": "application/json"
+            "Content-Type": "application/json",
+            "x-api-key": "349f35fa-fafc-41b9-89ed-ff19addc3494"
           },
           body: JSON.stringify(userData)
         }

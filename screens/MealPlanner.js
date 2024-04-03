@@ -27,7 +27,7 @@ class MealPlanner extends React.Component {
         Exclude: ""
       },
       isPlanGeneratedWithOpenAI: false,
-      isPlanGeneratedWithBgGPT: false,
+      isPlanGeneratedWithGemini: false,
       mealPlanImages: {},
       mealPlan: {},
       requestFailed: false,
@@ -36,7 +36,6 @@ class MealPlanner extends React.Component {
   }
 
   handleInputChange = (key, value) => {
-    // Validate numeric fields to accept only numbers
     if (
       key === "Calories" ||
       key === "Protein" ||
@@ -61,276 +60,231 @@ class MealPlanner extends React.Component {
     }
   };
 
-  generatePlanWithOpenAI = async () => {
-    try {
-      this.setState({
-        isPlanGeneratedWithOpenAI: true,
-        isPlanGeneratedWithBgGPT: false,
-        requestFailed: false,
-        isLoading: true
-      });
-      const { userPreferences } = this.state;
-      console.log("fetching openai");
-      const response = await fetch(
-        "https://api.openai.com/v1/chat/completions",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${EXPO_PUBLIC_OPENAI_API_KEY}`
-          },
-          body: JSON.stringify({
-            model: "gpt-4-0125-preview",
-            messages: [
-              {
-                role: "system",
-                content: `You are an experienced nutritionist that supervises patients to eat only edible food that is from
-                ${
-                  Array.isArray(userPreferences.Cuisine)
-                    ? userPreferences.Cuisine.length === 0
-                      ? "every"
-                      : userPreferences.Cuisine.length === 1
-                      ? userPreferences.Cuisine[0]
-                      : "the following"
-                    : userPreferences.Cuisine
-                } cuisine/cuisines. If you have been given French cuisine, try to avoid ratatouille, creme brulee, apple tart and omelette. Focus on creating an ACCURATE, diverse and delicious meal plan for the day that is comprised of the following limits: calories({userPreferences.Calories}), protein({userPreferences.Protein}), fat({userPreferences.Fat}) and carbohydrates({userPreferences.Carbohydrates}). Never go above or below the provided limits, and make SURE that the calories and fat are ALWAYS the same as the provided limits. Ensure the accuracy of the quantities while keeping true to the limits. Ensure that the meals you provide differ from meals you have given in previous requests, common meals you provide are Tarator, Banitsa, Cadaif, Cozonac, Moussaka and Quinoa. Ensure that you refrain from including the specified items. Export in JSON EXACTLY LIKE THE PROVIDED STRUCTURE in the content property in the body of this request without adding 'json' keyword with backticks. The response should only be pure json, nothing else. This means your response should not start with 'json*backticks*{data}*backticks*' or '*backticks*{data}*backticks*'.`
-              },
-              {
-                role: "user",
-                content: `Създайте ми дневно меню с ниско съдържание на мазнини, включващо едно ястие за закуска, три за обяд (третото трябва да е десерт) и две за вечеря (второто да бъде десерт). 
-                Менюто трябва стриктно да спазва следните лимити: да съдържа ${userPreferences.Calories} калории, ${userPreferences.Protein} грама протеин, ${userPreferences.Fat} грама мазнини и ${userPreferences.Carbohydrates} грама въглехидрати. 
-                НЕ Предоставяйте храни, които накрая имат значително по-малко количество калории, въглехидрати, протеин и мазнини в сравнение с посочените общи лимити (${userPreferences.Calories} калории, ${userPreferences.Protein} грама протеин, ${userPreferences.Fat} грама мазнини и ${userPreferences.Carbohydrates} грама въглехидрати) и НИКОГА, АБСОЛЮТНО НИКОГА не давай хранителен план, чийто сумирани стойности са с отклонение от лимитите на потребителя - 100 калории, 10 грама протеини, 20 грама въглехидрати, 10 грама мазнини. ДАВАЙ ВСЕКИ ПЪТ РАЗЛИЧНИ храни, а не еднакви или измислени рецепти.
-                Включвай само съществуващи в реалния свят храни в хранителния план. Предоставете точни мерки и точни стойности за калории, протеин, въглехидрати и мазнини за закуска, обяд, вечеря и общо. Включете само реалистични храни за консумация. 
-                Подсигури рецепти за приготвянето на храните и нужните продукти(съставки) към всяко едно ястие. Направи рецептите и съставките, така че да се получи накрая точното количество, което ще се яде, не повече от това.
-                Имената на храните трябва да бъдат адекватно преведени и написани на български език и да са реални ястия за консумация. 
-                Добави всички останали условия към менюто, но се увери, че избягваш стриктно да включваш следните елементи в менюто на храните: ${userPreferences.Exclude}. 
-                Съобрази се с начина на приготвяне и рецептите вече като имаш в предвид какво НЕ ТРЯБВА да се включва.
-                Имената на храните трябва да са адекватно преведени и написани, така че да са съществуващи храни. 
-                Форматирай общата информацията за калориите, протеина, въглехидратите и мазнините по следния начин И ВНИМАВАЙ ТЯ ДА НЕ Е РАЗЛИЧНА ОТ ОБЩАТА СТОЙНОСТ НА КАЛОРИИТЕ, ВЪГЛЕХИДРАТИТЕ, ПРОТЕИНА И МАЗНИНИТЕ НА ЯСТИЯТА: 'totals: {'calories': number,'protein': number,'fat': number,'carbohydrates': number,'grams':number}'. 
-                Форматирай сумираните стойности по абсолютно същият начин: 'totals: {'calories': number,'protein': number,'fat': number,'carbohydrates': number}'. 
-                Форматирай ЦЯЛАТА информация в JSON точно така: '{
-                breakfast':{
-                  'main':{'name':'string','totals':{'calories':'number','protein':'number','fat':'number','carbohydrates':'number','grams':'number'}, 'ingredients':['quantity ingredient','quantity ingredient','quantity ingredient','quantity ingredient','quantity ingredient'...], 'instructions':['1.string','2.string','3.string','4.string'...], 'recipeQuantity': 'number grams'}
-                },
-                'lunch':{
-                  'appetizer':{'name':'string','totals':{'calories':'number','protein':'number','fat':'number','carbohydrates':'number','grams':'number'}, 'ingredients':['quantity ingredient','quantity ingredient','quantity ingredient','quantity ingredient','quantity ingredient'...], 'instructions':['1.string','2.string','3.string','4.string'...], 'recipeQuantity': 'number grams'}, 
-                  'main':{'name':'string','totals':{'calories':'number','protein':'number','fat':'number','carbohydrates':'number','grams':'number'}, 'ingredients':['quantity ingredient','quantity ingredient','quantity ingredient','quantity ingredient','quantity ingredient'...], 'instructions':['1.string','2.string','3.string','4.string'...], 'recipeQuantity': 'number grams'}, 
-                  'dessert':{'name':'string','totals':{'calories':'number','protein':'number','fat':'number','carbohydrates':'number','grams':'number'}, 'ingredients':['quantity ingredient','quantity ingredient','quantity ingredient','quantity ingredient','quantity ingredient'...], 'instructions':['1.string','2.string','3.string','4.string'...], 'recipeQuantity': 'number grams'}
-                }, 
-                'dinner':{
-                  'main':{'name':'string','totals':{'calories':'number','protein':'number','fat':'number','carbohydrates':'number','grams':'number'}, 'ingredients':['quantity ingredient','quantity ingredient','quantity ingredient','quantity ingredient','quantity ingredient'...], 'instructions':['1.string','2.string','3.string','4.string'...], 'recipeQuantity': 'number grams'}, 
-                  'dessert':{'name':'string','totals':{'calories':'number','protein':'number','fat':'number','carbohydrates':'number','grams':'number'}, 'ingredients':['quantity ingredient','quantity ingredient','quantity ingredient','quantity ingredient','quantity ingredient'...], 'instructions':['1.string','2.string','3.string','4.string'...], 'recipeQuantity': 'number grams'}
-                }', като не превеждаш имената на нито едно property (ТЕ ТРЯБВА ДА СА САМО НА АНГЛИЙСКИ ЕЗИК). 
-                Не добавяй излишни кавички или думи, JSON формата трябва да е валиден. 
-                Преведи САМО стойностите на БЪЛГАРСКИ, без нито едно property. Те трябва ЗАДЪЛЖИТЕЛНО да са на английски. 
-                Грамажът на ястията е ЗАДЪЛЖИТЕЛНА стойност, която НЕ трябва да е повече от 500 грама. Не включвай грамажа в името на ястието, а го дай САМО като стойност в totals. 
-                Името на ястието е ЗАДЪЛЖИТЕЛНО на български`
-              }
-            ]
-          })
-        }
-      );
+  render() {
+    const cuisineTranslation = {
+      Italian: "Италианска",
+      Bulgarian: "Българска",
+      Spanish: "Испанска",
+      French: "Френска"
+    };
 
-      if (!response.ok) {
-        this.setState({
-          requestFailed: true
-        });
-        throw new Error("Failed to generate meal plan");
+    translateCuisine = (englishCuisine) => {
+      if (Array.isArray(englishCuisine)) {
+        return englishCuisine.map(
+          (cuisine) => cuisineTranslation[cuisine] || cuisine
+        );
+      } else {
+        return cuisineTranslation[englishCuisine] || englishCuisine;
       }
-      console.log("res: ", response);
-      const responseData = await response.json();
+    };
 
-      const unescapedData = responseData.choices[0].message.content;
-      const escapedData = decodeURIComponent(unescapedData);
-      console.log("escapedData: ", escapedData);
+    const translatedCuisine = translateCuisine(
+      this.state.userPreferences.Cuisine
+    );
 
-      const data = JSON.parse(escapedData);
+    let promptCuisine;
 
-      console.log("OPENAI: ", data);
-
-      const filteredArr = Object.fromEntries(
-        Object.entries(data).filter(([key]) => key !== "totals")
-      );
-
-      const mealPlanImagesData = {
-        breakfast: {
-          main: ""
-        },
-        lunch: {
-          appetizer: "",
-          main: "",
-          dessert: ""
-        },
-        dinner: {
-          main: "",
-          dessert: ""
-        }
-      };
-
-      // Iterate over each meal and make a separate image generation request
-      for (const mealKey of Object.keys(filteredArr)) {
-        const mealAppetizer = filteredArr[mealKey].appetizer;
-        const mealMain = filteredArr[mealKey].main;
-        const mealDessert = filteredArr[mealKey].dessert;
-
-        async function fetchImage(name) {
-          try {
-            let response = await fetch(
-              `https://customsearch.googleapis.com/customsearch/v1?key=AIzaSyBGskRKof9dkcoXtReamm4-h7UorF1G7yM&cx=10030740e88c842af&q=${encodeURIComponent(
-                name
-              )}&searchType=image`
-            );
-            if (response.status === 429) {
-              let response = await fetch(
-                `https://customsearch.googleapis.com/customsearch/v1?key=AIzaSyBpwC_IdPQ2u-16x_9QwoqJDu-zMhuFKxs&cx=258e213112b4b4492&q=${encodeURIComponent(
-                  name
-                )}&searchType=image`
-              );
-              return response;
-            } else {
-              return response;
-            }
-          } catch (error) {
-            console.error("Error fetching image:", error);
-            return null;
-          }
-        }
-
-        const imageAppetizer =
-          mealKey === "lunch" ? await fetchImage(mealAppetizer.name) : null;
-
-        const imageMain = await fetchImage(mealMain.name);
-
-        const imageDessert =
-          mealKey === "lunch" || mealKey === "dinner"
-            ? await fetchImage(mealDessert.name)
-            : null;
-
-        const imageAppetizerResponseData =
-          imageAppetizer !== null ? await imageAppetizer.json() : null;
-        const imageMainResponseData = await imageMain.json();
-        const imageDessertResponseData =
-          imageDessert !== null ? await imageDessert.json() : null;
-
-        if (
-          imageAppetizerResponseData !== null &&
-          imageAppetizerResponseData?.items?.[0]?.link
-        ) {
-          mealPlanImagesData[mealKey].appetizer =
-            imageAppetizerResponseData.items[0].link;
-        }
-
-        if (imageMainResponseData?.items?.[0]?.link) {
-          mealPlanImagesData[mealKey].main =
-            imageMainResponseData.items[0].link;
-        }
-
-        if (
-          imageDessertResponseData !== null &&
-          imageDessertResponseData?.items?.[0]?.link
-        ) {
-          mealPlanImagesData[mealKey].dessert =
-            imageDessertResponseData.items[0].link;
-        }
-      }
-
-      console.log("mealPlanImagesData:", mealPlanImagesData);
-
-      this.setState({
-        mealPlanImages: mealPlanImagesData,
-        mealPlan: data,
-        isLoading: false
-      });
-    } catch (error) {
-      this.setState({
-        requestFailed: true
-      });
-      console.error("Error generating meal plan:", error);
+    if (Array.isArray(translatedCuisine)) {
+      promptCuisine = translatedCuisine.join(", ");
+    } else {
+      promptCuisine = translatedCuisine;
     }
-  };
+    console.log("TRANSLATED --->", promptCuisine);
+    let cuisinePhrase;
 
-  generatePlanWithBgGPT = async () => {
-    try {
-      this.setState({
-        isPlanGeneratedWithOpenAI: false,
-        isPlanGeneratedWithBgGPT: true,
-        requestFailed: false
-      });
-
-      const requestBody = {
-        inputs: `Вие сте опитен диетолог, който наблюдава пациентите си дали консумират само ядлива храна от българската кухня и искам всичко, което даваш ТИ да е на БЪЛГАРСКИ ЕЗИК. Създайте ми дневно меню с ниско съдържание на мазнини, включващо едно ястие за закуска, три за обяд (третото трябва да е десерт) и две за вечеря (второто да бъде десерт). Менюто трябва стриктно да спазва следните лимити: да съдържа 2806.5 калории, 146.35 грама протеин, 68.23 грама мазнини и 319.39 грама въглехидрати. НЕ Предоставяйте храни, които накрая имат значително по-малко количество калории, въглехидрати, протеин и мазнини в сравнение с посочените общи лимити (2806.5 калории, 146.35 грама протеин, 68.23 грама мазнини и 319.39 грама въглехидрати) и НИКОГА, АБСОЛЮТНО НИКОГА не давай хранителен план, чийто сумирани стойности са с отклонение от лимитите на потребителя - 100 калории, 10 грама протеини, 20 грама въглехидрати, 10 грама мазнини. ДАВАЙТЕ ВСЕКИ ПЪТ РАЗЛИЧНИ храни, а не еднакви или измислени рецепти. Включвай само съществуващи в реалния свят храни в хранителния план. Предоставете точни мерки и точни стойности за калории, протеин, въглехидрати и мазнини за закуска, обяд, вечеря и общо. Включете само реалистични храни за консумация. Подсигури рецепти за приготвянето на храните и нужните продукти(съставки) към всяко едно ястие. Направи рецептите и съставките, така че да се получи накрая точното количество, което ще се яде, не повече или по-малко от това. Добави всички останали условия към менюто, но се увери, че избягваш стриктно да включваш следните елементи в менюто на храните: ориз. Съобрази се с начина на приготвяне и рецептите вече като имаш в предвид какво НЕ ТРЯБВА да се включва. Имената на храните трябва да са адекватно преведени и написани, така че да са съществуващи храни. Форматирай общата информацията за калориите, протеина, въглехидратите и мазнините по следния начин И ВНИМАВАЙ ТЯ ДА НЕ Е РАЗЛИЧНА ОТ ОБЩАТА СТОЙНОСТ НА КАЛОРИИТЕ, ВЪГЛЕХИДРАТИТЕ, ПРОТЕИНА И МАЗНИНИТЕ НА ЯСТИЯТА: 'totals: {'calories': number,'protein': number,'fat': number,'carbohydrates': number,'grams':number}'. Форматирай сумираните стойности по абсолютно същият начин: 'totals: {'calories': number,'protein': number,'fat': number,'carbohydrates': number}'. Форматирай ЦЯЛАТА информация в JSON точно така: '{breakfast':{'main':{'name':'string','totals':{'calories':'number','protein':'number','fat':'number','carbohydrates':'number','grams':'number'}, 'ingredients':['quantity ingredient','quantity ingredient'...], 'instructions':['1.string','2.string'...], 'recipeQuantity': 'number'}},'lunch':{'appetizer':{'name':'string','totals':{'calories':'number','protein':'number','fat':'number','carbohydrates':'number','grams':'number'}, 'ingredients':['quantity ingredient','quantity ingredient'...], 'instructions':['1.string','2.string'...], 'recipeQuantity': 'number'},'main':{'name':'string','totals':{'calories':'number','protein':'number','fat':'number','carbohydrates':'number','grams':'number'}, 'ingredients':['quantity ingredient','quantity ingredient'...], 'instructions':['1.string','2.string'...], 'recipeQuantity': 'number'},'dessert':{'name':'string','totals':{'calories':'number','protein':'number','fat':'number','carbohydrates':'number','grams':'number'}, 'ingredients':['quantity ingredient','quantity ingredient''...], 'instructions':['1.string','2.string'...], 'recipeQuantity': 'number'}},'dinner':{'main':{'name':'string','totals':{...}, 'ingredients':[...], 'instructions':[...], 'recipeQuantity': 'number'},'dessert':{'name':'string','totals':{...}, 'ingredients':[...], 'instructions':[...],'recipeQuantity': 'number'}}'. Имената на храните, съставките и стъпките за приготвяне трябва да са на БЪЛГАРСКИ ЕЗИК! В 'instructions', инструкциите трябва да са отделни стрингове, които да са номерирани. 'recipeQuantity' трябва да е просто number за грамове, а не string. Стойността на 'recipeQuantity' всъщо трябва винаги да е само и единствено число без никакви мерни единици. Стойността на 'recipeQuantity' е грамажа на ястието получено от рецептата. Съобразявай се с рецептата от 'instructions' когато определяш стойността на 'recipeQuantity'. Стойността на 'grams' е количеството храна в грамове, което потребителя трябва да изяде!! 'grams' никога не трябва да е под 200г! Препоръчвай всеки път различни ястия от миналият ти отговор.`,
-        id: "1b29f1e8-b189-4e34-bb98-65ad3c7c1182"
-      };
-
-      const response = await fetch("https://nutri-api.noit.eu/fetchChat", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify(requestBody)
-      });
-
-      if (!response.ok) {
-        throw new Error("Failed to generate meal plan with BgGPT");
+    if (Array.isArray(this.state.userPreferences.Cuisine)) {
+      if (this.state.userPreferences.Cuisine.length === 0) {
+        cuisinePhrase = "всяка";
+      } else if (this.state.userPreferences.Cuisine.length === 1) {
+        cuisinePhrase = this.state.userPreferences.Cuisine[0];
+      } else {
+        cuisinePhrase = "следните";
       }
-      const responseData = await response.json();
-      console.log("Response Data:", responseData);
-
-      const escapedJSON = responseData.response;
-      const jsonString = escapedJSON.replace(/\\n/g, "").replace(/\\"/g, '"');
-      const fixedjsonString = jsonString.replace(/,\s*]/g, "]");
-
-      const jsonObject = JSON.parse(fixedjsonString);
-      console.log("OBJECT:", jsonObject);
-      const mealPlanImagesData = {
-        breakfast: {
-          main: ""
-        },
-        lunch: {
-          appetizer: "",
-          main: "",
-          dessert: ""
-        },
-        dinner: {
-          main: "",
-          dessert: ""
+    } else {
+      cuisinePhrase = this.state.userPreferences.Cuisine;
+    }
+    console.log("cuisinePhrase --->", cuisinePhrase);
+    const prompt = `Вие сте опитен диетолог, който наблюдава пациентите да консумират само ядлива и традиционна храна от
+      ${cuisinePhrase} кухня/кухни (${promptCuisine}). Фокусирайте се върху създаването на ТОЧЕН, разнообразен и вкусен дневен хранителен план, съставен от следните ограничения: калории (${
+      this.state.userPreferences.Calories
+    }), протеин (${this.state.userPreferences.Protein}), мазнини (${
+      this.state.userPreferences.Fat
+    }) и въглехидрати (${
+      this.state.userPreferences.Carbohydrates
+    }). Никога не превишавайте или намалявайте предоставените лимити и се УВЕРЕТЕ, че калориите и мазнините ВИНАГИ са същите като предоставените лимити.
+        Осигурете точността на количествата, като същевременно се придържате към лимитите.
+        Уверете се, че предоставените от вас хранения се различават от тези, които сте предоставили в предишни заявки. Давай винаги нови и вкусни храни, така че винаги да се създаде уникално и разнообразно меню.
+        Експортирайте в JSON ТОЧНО КАТО ПРЕДОСТАВЕНАТА СТРУКТУРА в съдържанието на този заявка, без да добавяте 'json' ключова дума с обратни кавички.
+        Отговорът трябва да бъде чист JSON, нищо друго. Това означава, че вашият отговор не трябва да започва с 'json*backticks*{data}*backticks*' или '*backticks*{data}*backticks*'.
+        Създайте ми дневно меню с ниско съдържание на мазнини, включващо едно ястие за закуска, три за обяд (третото трябва да е десерт) и две за вечеря (второто да бъде десерт).
+        Менюто трябва стриктно да спазва следните лимити: да съдържа ${
+          this.state.userPreferences.Calories
+        } калории, ${this.state.userPreferences.Protein} грама протеин, ${
+      this.state.userPreferences.Fat
+    } грама мазнини и ${
+      this.state.userPreferences.Carbohydrates
+    } грама въглехидрати.
+        НЕ Предоставяйте храни, които накрая имат значително по-малко количество калории, въглехидрати, протеин и мазнини в сравнение с посочените общи лимити (${
+          this.state.userPreferences.Calories
+        } калории, ${this.state.userPreferences.Protein} грама протеин, ${
+      this.state.userPreferences.Fat
+    } грама мазнини и ${
+      this.state.userPreferences.Carbohydrates
+    } грама въглехидрати) и НИКОГА, АБСОЛЮТНО НИКОГА не давай хранителен план, чийто сумирани стойности са с отклонение от лимитите на потребителя - 100 калории, 10 грама протеини, 20 грама въглехидрати, 10 грама мазнини. ДАВАЙ ВСЕКИ ПЪТ РАЗЛИЧНИ храни, а не еднакви или измислени рецепти.
+        Включвай само съществуващи в реалния свят храни в хранителния план. Предоставете точни мерки и точни стойности за калории, протеин, въглехидрати и мазнини за закуска, обяд, вечеря и общо. Включете само реалистични храни за консумация.
+        Подсигури рецепти за приготвянето на храните и нужните продукти(съставки) към всяко едно ястие. Направи рецептите и съставките, така че да се получи накрая точното количество, което ще се яде, не повече от това.
+        Имената на храните трябва да бъдат адекватно преведени и написани на български език и да са реални ястия за консумация.
+        ${
+          this.state.userPreferences.Exclude &&
+          `Добави всички останали условия към менюто, но се увери, че избягваш стриктно да включваш следните елементи в менюто на храните: ${this.state.userPreferences.Exclude}.
+          Съобрази се с начина на приготвяне и рецептите вече като имаш в предвид какво НЕ ТРЯБВА да се включва.`
         }
-      };
+        Имената на храните трябва да са адекватно преведени и написани, така че да са съществуващи храни.
+        Форматирай общата информацията за калориите, протеина, въглехидратите и мазнините по следния начин И ВНИМАВАЙ ТЯ ДА НЕ Е РАЗЛИЧНА ОТ ОБЩАТА СТОЙНОСТ НА КАЛОРИИТЕ, ВЪГЛЕХИДРАТИТЕ, ПРОТЕИНА И МАЗНИНИТЕ НА ЯСТИЯТА: 'totals: {'calories': number,'protein': number,'fat': number,'carbohydrates': number,'grams':number}'.
+        Форматирай ЦЯЛАТА информация във валиден JSON точно така:
+        "'breakfast':{
+            'main':{'name':'string','totals':{'calories':number,'protein':number,'fat':number,'carbohydrates':number,'grams':number}, 'ingredients':['quantity ingredient','quantity ingredient','quantity ingredient','quantity ingredient','quantity ingredient'...], 'instructions':['1.string','2.string','3.string','4.string'...], 'recipeQuantity': number (in grams)}
+          },
+          'lunch':{
+            'appetizer':{'name':'string','totals':{'calories':number,'protein':number,'fat':number,'carbohydrates':number,'grams':number}, 'ingredients':['quantity ingredient','quantity ingredient','quantity ingredient','quantity ingredient','quantity ingredient'...], 'instructions':['1.string','2.string','3.string','4.string'...], 'recipeQuantity': number (in grams)},
+            'main':{'name':'string','totals':{'calories':number,'protein':number,'fat':number,'carbohydrates':number,'grams':number}, 'ingredients':['quantity ingredient','quantity ingredient','quantity ingredient','quantity ingredient','quantity ingredient'...], 'instructions':['1.string','2.string','3.string','4.string'...], 'recipeQuantity': number (in grams)},
+            'dessert':{'name':'string','totals':{'calories':number,'protein':number,'fat':number,'carbohydrates':number,'grams':number}, 'ingredients':['quantity ingredient','quantity ingredient','quantity ingredient','quantity ingredient','quantity ingredient'...], 'instructions':['1.string','2.string','3.string','4.string'...], 'recipeQuantity': number (in grams)}
+          },
+          'dinner':{
+            'main':{'name':'string','totals':{'calories':number,'protein':number,'fat':number,'carbohydrates':number,'grams':number}, 'ingredients':['quantity ingredient','quantity ingredient','quantity ingredient','quantity ingredient','quantity ingredient'...], 'instructions':['1.string','2.string','3.string','4.string'...], 'recipeQuantity': number (in grams)},
+            'dessert':{'name':'string','totals':{'calories':number,'protein':number,'fat':number,'carbohydrates':number,'grams':number}, 'ingredients':['quantity ingredient','quantity ingredient','quantity ingredient','quantity ingredient','quantity ingredient'...], 'instructions':['1.string','2.string','3.string','4.string'...], 'recipeQuantity': number (in grams)}
+          }`;
 
-      // Iterate over each meal and make a separate image generation request
-      for (const mealKey of Object.keys(jsonObject)) {
-        const meal = jsonObject[mealKey];
-        const mealAppetizer = meal.appetizer;
-        const mealMain = meal.main;
-        const mealDessert = meal.dessert;
+    checkTotals = (obj) => {
+      if (Array.isArray(obj)) {
+        obj.forEach((item) => checkTotals(item));
+      } else if (typeof obj === "object" && obj !== null) {
+        if (obj.hasOwnProperty("totals")) {
+          for (let key in obj.totals) {
+            if (typeof obj.totals[key] !== "number") {
+              throw new Error(
+                `Invalid value for ${key} in totals: Expected a number`
+              );
+            }
+          }
+        }
+        // Recursively check the nested objects
+        for (let key in obj) {
+          checkTotals(obj[key]);
+        }
+      }
+    };
 
-        async function fetchImage(name) {
-          try {
-            let response = await fetch(
-              `https://customsearch.googleapis.com/customsearch/v1?key=YOUR_API_KEY&cx=YOUR_CUSTOM_SEARCH_ENGINE_ID&q=${encodeURIComponent(
-                name
-              )}&searchType=image`
-            );
-            if (response.status === 429) {
+    generatePlanWithOpenAI = async () => {
+      try {
+        this.setState({
+          isPlanGeneratedWithOpenAI: true,
+          isPlanGeneratedWithBgGPT: false,
+          requestFailed: false,
+          isLoading: true
+        });
+        console.log("fetching openai");
+        const response = await fetch(
+          "https://api.openai.com/v1/chat/completions",
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${EXPO_PUBLIC_OPENAI_API_KEY}`
+            },
+            body: JSON.stringify({
+              model: "gpt-4-0125-preview",
+              messages: [
+                {
+                  role: "user",
+                  content: prompt
+                }
+              ]
+            })
+          }
+        );
+
+        if (!response.ok) {
+          this.setState({
+            requestFailed: true
+          });
+          throw new Error("Failed to generate meal plan");
+        }
+        console.log("res: ", response);
+        const responseData = await response.json();
+
+        const unescapedData = responseData.choices[0].message.content;
+        const escapedData = decodeURIComponent(unescapedData);
+        console.log("escapedData: ", escapedData);
+
+        const data = JSON.parse(escapedData);
+
+        console.log("OPENAI: ", data);
+
+        const filteredArr = Object.fromEntries(
+          Object.entries(data).filter(([key]) => key !== "totals")
+        );
+
+        const mealPlanImagesData = {
+          breakfast: {
+            main: ""
+          },
+          lunch: {
+            appetizer: "",
+            main: "",
+            dessert: ""
+          },
+          dinner: {
+            main: "",
+            dessert: ""
+          }
+        };
+
+        // Iterate over each meal and make a separate image generation request
+        for (const mealKey of Object.keys(filteredArr)) {
+          const mealAppetizer = filteredArr[mealKey].appetizer;
+          const mealMain = filteredArr[mealKey].main;
+          const mealDessert = filteredArr[mealKey].dessert;
+
+          async function fetchImage(name) {
+            try {
               let response = await fetch(
-                `https://customsearch.googleapis.com/customsearch/v1?key=YOUR_API_KEY&cx=YOUR_CUSTOM_SEARCH_ENGINE_ID&q=${encodeURIComponent(
+                `https://customsearch.googleapis.com/customsearch/v1?key=AIzaSyBGskRKof9dkcoXtReamm4-h7UorF1G7yM&cx=10030740e88c842af&q=${encodeURIComponent(
                   name
                 )}&searchType=image`
               );
-              return response;
-            } else {
-              return response;
+              if (response.status === 429) {
+                let response = await fetch(
+                  `https://customsearch.googleapis.com/customsearch/v1?key=AIzaSyBpwC_IdPQ2u-16x_9QwoqJDu-zMhuFKxs&cx=258e213112b4b4492&q=${encodeURIComponent(
+                    name
+                  )}&searchType=image`
+                );
+                return response;
+              } else {
+                return response;
+              }
+            } catch (error) {
+              console.error("Error fetching image:", error);
+              return null;
             }
-          } catch (error) {
-            console.error("Error fetching image:", error);
-            return null;
           }
-        }
 
-        // Process images for appetizer
-        if (mealAppetizer && mealAppetizer.name) {
-          const imageAppetizer = await fetchImage(mealAppetizer.name);
-          const imageAppetizerResponseData = await imageAppetizer.json();
+          const imageAppetizer =
+            mealKey === "lunch" ? await fetchImage(mealAppetizer.name) : null;
+
+          const imageMain = await fetchImage(mealMain.name);
+
+          const imageDessert =
+            mealKey === "lunch" || mealKey === "dinner"
+              ? await fetchImage(mealDessert.name)
+              : null;
+
+          const imageAppetizerResponseData =
+            imageAppetizer !== null ? await imageAppetizer.json() : null;
+          const imageMainResponseData = await imageMain.json();
+          const imageDessertResponseData =
+            imageDessert !== null ? await imageDessert.json() : null;
+
           if (
             imageAppetizerResponseData !== null &&
             imageAppetizerResponseData?.items?.[0]?.link
@@ -338,22 +292,12 @@ class MealPlanner extends React.Component {
             mealPlanImagesData[mealKey].appetizer =
               imageAppetizerResponseData.items[0].link;
           }
-        }
 
-        // Process images for main course
-        if (mealMain && mealMain.name) {
-          const imageMain = await fetchImage(mealMain.name);
-          const imageMainResponseData = await imageMain.json();
           if (imageMainResponseData?.items?.[0]?.link) {
             mealPlanImagesData[mealKey].main =
               imageMainResponseData.items[0].link;
           }
-        }
 
-        // Process images for dessert
-        if (mealDessert && mealDessert.name) {
-          const imageDessert = await fetchImage(mealDessert.name);
-          const imageDessertResponseData = await imageDessert.json();
           if (
             imageDessertResponseData !== null &&
             imageDessertResponseData?.items?.[0]?.link
@@ -362,153 +306,187 @@ class MealPlanner extends React.Component {
               imageDessertResponseData.items[0].link;
           }
         }
+
+        console.log("mealPlanImagesData:", mealPlanImagesData);
+
+        this.setState({
+          mealPlanImages: mealPlanImagesData,
+          mealPlan: data,
+          isLoading: false
+        });
+      } catch (error) {
+        this.setState({
+          requestFailed: true,
+          isLoading: false
+        });
+        console.error("Error generating meal plan:", error);
       }
+    };
 
-      this.setState({
-        mealPlanImages: mealPlanImagesData,
-        mealPlan: jsonObject
-      });
-    } catch (error) {
-      this.setState({
-        requestFailed: true
-      });
-      console.error("Error generating meal plan with BgGPT:", error);
-    }
-  };
+    generatePlanWithGemini = async () => {
+      try {
+        this.setState({
+          isPlanGeneratedWithOpenAI: false,
+          isPlanGeneratedWithGemini: true,
+          requestFailed: false,
+          isLoading: true
+        });
+        console.log("PROMPT --->", prompt);
+        console.log("fetching gemini");
+        const response = await fetch(
+          "https://nutri-api.noit.eu/geminiGenerateResponse",
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              "x-api-key": "349f35fa-fafc-41b9-89ed-ff19addc3494"
+            },
+            body: JSON.stringify({ text: prompt })
+          }
+        );
 
-  // generatePlanWithGemini = async () => {
-  //   try {
-  //     this.setState({
-  //       isPlanGeneratedWithBgGPT: true,
-  //       isPlanGeneratedWithOpenAI: false
-  //     });
+        const responseData = await response.json();
 
-  //     const API_KEY = "AIzaSyABczafdONRkfzzbKXHMpnwCFnuV4-xLUs";
-  //     const genAI = new GoogleGenerativeAI(API_KEY);
-  //     const model = genAI.getGenerativeModel({ model: "gemini-pro" });
+        console.log("Response from backend:", responseData.aiResponse);
 
-  //     const prompt = `prompt`;
+        const stringToRepair = responseData.aiResponse
+          .replace(/^```json([\s\S]*?)```$/, "$1")
+          .replace(/^```JSON([\s\S]*?)```$/, "$1")
+          .replace(/^'|'$/g, "")
+          .trim();
 
-  //     const result = await model.generateContent(prompt);
+        let jsonObject;
+        try {
+          jsonObject = JSON.parse(stringToRepair);
+          checkTotals(jsonObject);
+        } catch (parseError) {
+          throw new Error("Invalid JSON response from the server");
+        }
 
-  //     const response = result.response;
-  //     const text = response.text();
-  //     console.log("text: ", text);
+        console.log("jsonObject: ", jsonObject);
 
-  //     const stringToRepair = text
-  //       .replace(/^```json([\s\S]*?)```$/, "$1")
-  //       .replace(/^```JSON([\s\S]*?)```$/, "$1")
-  //       .replace(/^'|'$/g, "") // Remove single quotes at the beginning and end
-  //       .trim();
-  //     console.log("stringToRepair: ", stringToRepair);
-  //     const jsonObject = JSON.parse(stringToRepair);
+        const mealPlanImagesData = {
+          breakfast: {
+            main: ""
+          },
+          lunch: {
+            appetizer: "",
+            main: "",
+            dessert: ""
+          },
+          dinner: {
+            main: "",
+            dessert: ""
+          }
+        };
+        const updatedMealPlanImagesData = {};
+        const updatedMealPlan = {};
+        for (const mealKey of Object.keys(jsonObject)) {
+          if (mealKey !== "totals") {
+            const mealAppetizer = jsonObject[mealKey].appetizer;
+            const mealMain = jsonObject[mealKey].main;
+            const mealDessert = jsonObject[mealKey].dessert;
 
-  //     console.log("jsonObject: ", jsonObject);
+            // console.log("meal: ", meal);
+            // console.log("meal name: ", meal.name);
 
-  //     const mealPlanImagesData = {
-  //       breakfast: {
-  //         main: ""
-  //       },
-  //       lunch: {
-  //         appetizer: "",
-  //         main: "",
-  //         dessert: ""
-  //       },
-  //       dinner: {
-  //         main: "",
-  //         dessert: ""
-  //       }
-  //     };
+            //NutriFit: cx=10030740e88c842af, key=AIzaSyDqUez1TEmLSgZAvIaMkWfsq9rSm0kDjIw
+            //NutriFit2: cx=258e213112b4b4492, key=AIzaSyArE48NFh1befjjDxpSrJ0eBgQh_OmQ7RA
+            //NutriFit3: cx=527000b0fabcc4dab, key=AIzaSyDwqaIBGxmhEc6GVR3lwOVk_-0EpwKvOPA
+            async function fetchImage(name) {
+              try {
+                let response = await fetch(
+                  `https://customsearch.googleapis.com/customsearch/v1?key=AIzaSyDqUez1TEmLSgZAvIaMkWfsq9rSm0kDjIw&cx=10030740e88c842af&q=${encodeURIComponent(
+                    name
+                  )}&searchType=image`
+                );
+                if (response.status === 429) {
+                  let response = await fetch(
+                    `https://customsearch.googleapis.com/customsearch/v1?key=AIzaSyBQMvBehFDpwqhNc9_q-lIfPh8O2xdQ1Mc&cx=258e213112b4b4492&q=${encodeURIComponent(
+                      name
+                    )}&searchType=image`
+                  );
+                  return response;
+                } else {
+                  return response;
+                }
+              } catch (error) {
+                console.error("Error fetching image:", error);
+                return null;
+              }
+            }
 
-  //     for (const mealKey of Object.keys(jsonObject)) {
-  //       if (mealKey !== "totals") {
-  //         const mealAppetizer = jsonObject[mealKey].appetizer;
-  //         const mealMain = jsonObject[mealKey].main;
-  //         const mealDessert = jsonObject[mealKey].dessert;
+            const imageAppetizer =
+              mealKey === "lunch" ? await fetchImage(mealAppetizer.name) : null;
 
-  //         async function fetchImage(name) {
-  //           try {
-  //             let response = await fetch(
-  //               `https://customsearch.googleapis.com/customsearch/v1?key=YOUR_API_KEY&cx=YOUR_CUSTOM_SEARCH_ENGINE_ID&q=${encodeURIComponent(
-  //                 name
-  //               )}&searchType=image`
-  //             );
-  //             if (response.status === 429) {
-  //               let response = await fetch(
-  //                 `https://customsearch.googleapis.com/customsearch/v1?key=YOUR_API_KEY&cx=YOUR_CUSTOM_SEARCH_ENGINE_ID&q=${encodeURIComponent(
-  //                   name
-  //                 )}&searchType=image`
-  //               );
-  //               return response;
-  //             } else {
-  //               return response;
-  //             }
-  //           } catch (error) {
-  //             console.error("Error fetching image:", error);
-  //             return null;
-  //           }
-  //         }
+            const imageMain = await fetchImage(mealMain.name);
 
-  //         const imageAppetizer =
-  //           mealKey === "lunch" ? await fetchImage(mealAppetizer.name) : null;
+            const imageDessert =
+              mealKey === "lunch" || mealKey === "dinner"
+                ? await fetchImage(mealDessert.name)
+                : null;
 
-  //         const imageMain = await fetchImage(mealMain?.name);
+            const imageAppetizerResponseData =
+              imageAppetizer !== null ? await imageAppetizer.json() : null;
+            const imageMainResponseData = await imageMain.json();
+            const imageDessertResponseData =
+              imageDessert !== null ? await imageDessert.json() : null;
 
-  //         const imageDessert =
-  //           mealKey === "lunch" || mealKey === "dinner"
-  //             ? await fetchImage(mealDessert.name)
-  //             : null;
+            console.log("imageDessert: ", imageDessert, mealKey);
+            // console.log(
+            //   `Image Generation Response for ${mealAppetizer.name}: `,
+            //   imageAppetizerResponseData.items[0].link
+            // );
+            if (
+              imageAppetizerResponseData !== null &&
+              imageAppetizerResponseData?.items?.[0]?.link
+            ) {
+              mealPlanImagesData[mealKey].appetizer =
+                imageAppetizerResponseData.items[0].link;
+            }
 
-  //         const imageAppetizerResponseData =
-  //           imageAppetizer !== null ? await imageAppetizer.json() : null;
-  //         const imageMainResponseData = await imageMain.json();
-  //         const imageDessertResponseData =
-  //           imageDessert !== null ? await imageDessert.json() : null;
+            if (imageMainResponseData?.items?.[0]?.link) {
+              mealPlanImagesData[mealKey].main =
+                imageMainResponseData.items[0].link;
+            }
 
-  //         console.log("mealPlanImagesData: ", mealPlanImagesData);
+            if (
+              imageDessertResponseData !== null &&
+              imageDessertResponseData?.items?.[0]?.link
+            ) {
+              mealPlanImagesData[mealKey].dessert =
+                imageDessertResponseData.items[0].link;
+            }
 
-  //         if (
-  //           imageAppetizerResponseData !== null &&
-  //           imageAppetizerResponseData?.items?.[0]?.link
-  //         ) {
-  //           mealPlanImagesData[mealKey].appetizer =
-  //             imageAppetizerResponseData.items[0].link;
-  //         }
+            updatedMealPlanImagesData[mealKey] = {
+              appetizer: imageAppetizerResponseData?.items?.[0]?.link || "",
+              main: imageMainResponseData.items[0].link,
+              dessert: imageDessertResponseData?.items?.[0]?.link || ""
+            };
 
-  //         if (imageMainResponseData?.items?.[0]?.link) {
-  //           console.log("mealPlanImagesData[mealKey].main: ", mealKey);
-  //           mealPlanImagesData[mealKey].main =
-  //             imageMainResponseData.items[0].link;
-  //         }
+            updatedMealPlan[mealKey] = {
+              appetizer: jsonObject[mealKey].appetizer,
+              main: jsonObject[mealKey].main,
+              dessert: jsonObject[mealKey].dessert
+            };
+          }
+        }
 
-  //         if (
-  //           imageDessertResponseData !== null &&
-  //           imageDessertResponseData?.items?.[0]?.link
-  //         ) {
-  //           mealPlanImagesData[mealKey].dessert =
-  //             imageDessertResponseData.items[0].link;
-  //         }
-  //       }
-  //     }
+        this.setState({
+          mealPlanImages: updatedMealPlanImagesData,
+          mealPlan: updatedMealPlan,
+          isLoading: false
+        });
+      } catch (error) {
+        this.setState({
+          requestFailed: true,
+          isLoading: false
+        });
+        console.error("Error generating meal plan:", error);
+      }
+    };
 
-  //     setMealPlanImages(mealPlanImagesData);
-
-  //     setMealPlan({
-  //       breakfast: jsonObject.breakfast,
-  //       lunch: jsonObject.lunch,
-  //       dinner: jsonObject.dinner
-  //     });
-  //     setIsLoading(false);
-  //   } catch (error) {
-  //     this.setState({
-  //       requestFailed: true
-  //     });
-  //     console.error("Error generating meal plan:", error);
-  //   }
-  // };
-
-  render() {
-    const { isLoading, userPreferences } = this.state;
+    const { isLoading, requestFailed, userPreferences } = this.state;
 
     return (
       <View style={styles.container}>
@@ -562,18 +540,19 @@ class MealPlanner extends React.Component {
               <ActivityIndicator size="large" color="#0000ff" />
             </View>
           )}
+          {requestFailed && <Text>kuro mi dedov</Text>}
           <View style={styles.buttonContainer}>
             <TouchableOpacity
               style={styles.button}
-              onPress={this.generatePlanWithOpenAI}
+              onPress={generatePlanWithOpenAI}
             >
               <Text style={styles.buttonText}>Generate with OpenAI</Text>
             </TouchableOpacity>
             <TouchableOpacity
               style={styles.button}
-              onPress={this.generatePlanWithBgGPT}
+              onPress={generatePlanWithGemini}
             >
-              <Text style={styles.buttonText}>Generate with BgGPT</Text>
+              <Text style={styles.buttonText}>Generate with Gemini</Text>
             </TouchableOpacity>
           </View>
 
@@ -582,7 +561,7 @@ class MealPlanner extends React.Component {
             const mealImages = this.state.mealPlanImages[mealType]; // Get all images for the meal type
 
             return (
-              <React.Fragment key={index} style={styles.inputContainer}>
+              <React.Fragment key={index}>
                 {/* Map through each item in the meal type */}
                 {Object.keys(meal).map((itemType) => {
                   const item = meal[itemType]; // Get the item details
@@ -591,11 +570,13 @@ class MealPlanner extends React.Component {
                   // Check if item exists before rendering RecipeWidget
                   if (item) {
                     return (
-                      <RecipeWidget
-                        key={`${mealType}-${itemType}`}
-                        image={mealImage}
-                        item={item}
-                      />
+                      <Block style={styles.inputContainer}>
+                        <RecipeWidget
+                          key={`${mealType}-${itemType}`}
+                          image={mealImage}
+                          item={item}
+                        />
+                      </Block>
                     );
                   } else {
                     // Handle case where item is undefined

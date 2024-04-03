@@ -10,7 +10,6 @@ import {
 import { Block, Text } from "galio-framework";
 import { Button, Icon, Input } from "../components";
 import { Images, argonTheme } from "../constants";
-import firebase from "firebase/app";
 import {
   getAuth,
   createUserWithEmailAndPassword,
@@ -43,8 +42,8 @@ class Register extends React.Component {
           .then(() => {
             // Handle successful sign-in
             console.log("User logged in successfully!");
-            // Redirect the user to the app
-            this.props.navigation.navigate("App");
+            // Redirect the user to the UserMeasurements
+            this.props.navigation.navigate("UserMeasurements");
           })
           .catch((error) => {
             // Handle sign-in errors

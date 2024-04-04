@@ -20,21 +20,6 @@ const iPhoneX = () =>
   Platform.OS === "ios" &&
   (height === 812 || width === 812 || height === 896 || width === 896);
 
-const BellButton = ({ isWhite, style, navigation }) => (
-  <TouchableOpacity
-    style={[styles.button, style]}
-    onPress={() => navigation.navigate("Pro")}
-  >
-    <Icon
-      family="NutriExtra"
-      size={16}
-      name="bell"
-      color={nutriTheme.COLORS[isWhite ? "WHITE" : "ICON"]}
-    />
-    <Block middle style={styles.notify} />
-  </TouchableOpacity>
-);
-
 const LogOutButton = ({ isWhite, style, navigation }) => {
   const handleLogOut = async () => {
     const auth = getAuth();
@@ -60,17 +45,6 @@ class Header extends React.Component {
   };
   renderRight = () => {
     const { white, title, navigation } = this.props;
-
-    if (title === "Title") {
-      return [
-        <BellButton key="chat-title" navigation={navigation} isWhite={white} />,
-        <LogOutButton
-          key="basket-title"
-          navigation={navigation}
-          isWhite={white}
-        />
-      ];
-    }
 
     switch (title) {
       case "MealPlanner":
@@ -102,7 +76,7 @@ class Header extends React.Component {
   renderHeader = () => {
     const { search, options, tabs } = this.props;
     if (search || tabs || options) {
-      return <Block center>{tabs ? this.renderTabs() : null}</Block>;
+      return <Block center>{tabs ? this.renderTabs() : null} </Block>;
     }
   };
   render() {
@@ -130,30 +104,17 @@ class Header extends React.Component {
 
     return (
       <Block style={headerStyles}>
-        <Block flex={0.06} style={styles.header}>
-          <Image styles={styles.logo} source={Images.Logo} />
-        </Block>
         <NavBar
           back={false}
-          title={title}
           style={navbarStyles}
           transparent={transparent}
           right={this.renderRight()}
-          rightStyle={{ alignItems: "center" }}
-          left={
-            <Icon
-              name={back ? "chevron-left" : "menu"}
-              family="entypo"
-              size={20}
-              onPress={this.handleLeftPress}
-              color={
-                iconColor ||
-                (white ? nutriTheme.COLORS.WHITE : nutriTheme.COLORS.ICON)
-              }
-              style={{ marginTop: 2 }}
-            />
-          }
-          leftStyle={{ paddingVertical: 12, flex: 0.2 }}
+          rightStyle={{
+            alignItems: "center",
+            marginTop: 60,
+            marginLeft: 270
+          }}
+          leftStyle={{ paddingVertical: 12 }}
           titleStyle={[
             styles.title,
             { color: nutriTheme.COLORS[white ? "WHITE" : "HEADER"] },
@@ -161,7 +122,9 @@ class Header extends React.Component {
           ]}
           {...props}
         />
-        {this.renderHeader()}
+        <Block flex={0.06} style={styles.logoHeader}>
+          <Image styles={styles.logo} source={Images.Logo} />
+        </Block>
       </Block>
     );
   }
@@ -172,6 +135,12 @@ const styles = StyleSheet.create({
     padding: 12,
     position: "relative"
   },
+  logoHeader: {
+    paddingHorizontal: 18,
+    paddingBottom: theme.SIZES.BASE * 2,
+    justifyContent: "center",
+    zIndex: 9999999
+  },
   title: {
     width: "100%",
     fontSize: 16,
@@ -180,7 +149,7 @@ const styles = StyleSheet.create({
   navbar: {
     paddingVertical: 0,
     paddingBottom: theme.SIZES.BASE * 1.5,
-    paddingTop: iPhoneX ? theme.SIZES.BASE * 4 : theme.SIZES.BASE,
+    paddingTop: iPhoneX ? theme.SIZES.BASE * 2 : theme.SIZES.BASE,
     zIndex: 5
   },
   shadow: {

@@ -14,6 +14,8 @@ import RecipeWidget from "../components/RecipeWidget";
 const { width } = Dimensions.get("screen");
 import { getAuth } from "firebase/auth";
 import DailyCalorieRequirements from "./DailyCalorieRequirements";
+import { Card } from "../components";
+import { nutriTheme } from "../constants";
 
 class MealPlanner extends React.Component {
   constructor(props) {
@@ -604,23 +606,27 @@ class MealPlanner extends React.Component {
     const levels = [1, 2, 3, 4, 5, 6];
 
     console.log("activityLevel: ", activityLevel);
+
     return (
       <View style={styles.container}>
         <ScrollView contentContainerStyle={styles.scrollViewContent}>
-          <View style={styles.buttonContainer}>
-            {levels.map((level) => (
-              <TouchableOpacity
-                key={level}
-                style={[
-                  styles.button,
-                  activityLevel === level ? styles.activeButton : null
-                ]}
-                onPress={() => this.setState({ activityLevel: level })}
-              >
-                <Text style={styles.buttonText}>Ниво {level}</Text>
-              </TouchableOpacity>
-            ))}
-          </View>
+          <Card>
+            <Text style={styles.title}>Изберете ниво на натовареност:</Text>
+            <View style={styles.buttonContainer}>
+              {levels.map((level) => (
+                <TouchableOpacity
+                  key={level}
+                  style={[
+                    styles.button,
+                    activityLevel === level ? styles.activeButton : null
+                  ]}
+                  onPress={() => this.setState({ activityLevel: level })}
+                >
+                  <Text style={styles.buttonText}>{level}</Text>
+                </TouchableOpacity>
+              ))}
+            </View>
+          </Card>
           <DailyCalorieRequirements
             dailyCaloryRequirementsArray={dailyCaloryRequirements}
             activityLevel={activityLevel}
@@ -768,6 +774,13 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "center",
     alignItems: "center"
+  },
+  title: {
+    lineHeight: 19,
+    fontWeight: "400",
+    color: nutriTheme.COLORS.HEADER,
+    marginTop: 10,
+    marginBottom: 10
   }
 });
 

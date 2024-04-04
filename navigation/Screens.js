@@ -3,7 +3,6 @@ import { Animated, Dimensions, Easing } from "react-native";
 import { Header, Icon } from "../components";
 import React, { useEffect, useState } from "react"; // Add this line
 // drawer
-import CustomDrawerContent from "./Menu";
 import MealPlanner from "../screens/MealPlanner";
 import Onboarding from "../screens/Onboarding";
 import Register from "../screens/Register";
@@ -129,7 +128,6 @@ function AppStack(props) {
   return (
     <Drawer.Navigator
       style={{ flex: 1 }}
-      drawerContent={(props) => <CustomDrawerContent {...props} />}
       drawerStyle={{
         backgroundColor: "white",
         width: width * 0.8

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import {
   StyleSheet,
   Dimensions,
@@ -13,11 +13,13 @@ import { EXPO_PUBLIC_OPENAI_API_KEY } from "@env";
 import RecipeWidget from "../components/RecipeWidget";
 import articles from "../constants/articles";
 const { width } = Dimensions.get("screen");
+import { getAuth } from "firebase/auth";
 
 class MealPlanner extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
+      currentUser: null,
       userPreferences: {
         Cuisine: "",
         Calories: "",
@@ -26,6 +28,7 @@ class MealPlanner extends React.Component {
         Carbohydrates: "",
         Exclude: ""
       },
+      activityLevel: null,
       isPlanGeneratedWithOpenAI: false,
       isPlanGeneratedWithGemini: false,
       mealPlanImages: {},
@@ -34,6 +37,103 @@ class MealPlanner extends React.Component {
       isLoading: false
     };
   }
+
+  componentDidMount() {
+    const auth = getAuth();
+    this.unsubscribe = auth.onAuthStateChanged((user) => {
+      if (user) {
+        this.setState({ currentUser: user });
+      } else {
+        this.setState({ currentUser: null });
+      }
+    });
+  }
+
+  componentDidUpdate(prevProps, prevState) {
+    if (
+      prevState.currentUser !== this.state.currentUser &&
+      this.state.currentUser
+    ) {
+      this.fetchData();
+    }
+  }
+
+  componentWillUnmount() {
+    this.unsubscribe();
+  }
+
+  fetchData = async () => {
+    try {
+      const uid = this.state.currentUser.uid;
+      const date = new Date().toISOString().slice(0, 10);
+      const response = await fetch(
+        "https://nutri-api.noit.eu/weightStatsAndMealPlanner",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "x-api-key": "349f35fa-fafc-41b9-89ed-ff19addc3494"
+          },
+          body: JSON.stringify({
+            uid: uid,
+            date: date
+          })
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error("Failed to fetch weight stats");
+      }
+
+      const weightStatsData = await response.json();
+
+      // Update state with fetched data
+      this.setState({
+        userData: {
+          gender: weightStatsData.userDataSaveable.gender,
+          goal: weightStatsData.userDataSaveable.goal,
+          age: weightStatsData.userDataSaveable.age,
+          height: weightStatsData.userDataSaveable.height,
+          waist: weightStatsData.userDataSaveable.waist,
+          neck: weightStatsData.userDataSaveable.neck,
+          hip: weightStatsData.userDataSaveable.hip,
+          weight: weightStatsData.userDataSaveable.weight
+        },
+        perfectWeight: weightStatsData.perfectWeight,
+        differenceFromPerfectWeight: {
+          difference:
+            weightStatsData?.differenceFromPerfectWeight?.difference || 0,
+          isUnderOrAbove:
+            weightStatsData?.differenceFromPerfectWeight?.isUnderOrAbove || ""
+        },
+        health: weightStatsData.bmiIndex.health,
+        recommendedGoal: this.calculateRecommendedGoal(
+          weightStatsData.differenceFromPerfectWeight
+        ),
+        dailyCaloryRequirements: weightStatsData.dailyCaloryRequirements,
+        macroNutrients: weightStatsData.macroNutrientsData
+      });
+    } catch (error) {
+      console.error("Error fetching weight stats:", error);
+    }
+  };
+
+  calculateRecommendedGoal = (differenceFromPerfectWeight) => {
+    const difference = differenceFromPerfectWeight.difference;
+    const underOrAbove = differenceFromPerfectWeight.isUnderOrAbove;
+
+    let recommendedGoal;
+
+    if (Math.abs(difference) < 2) {
+      recommendedGoal = "Запазите";
+    } else if (underOrAbove === "under" && Math.abs(difference) >= 2) {
+      recommendedGoal = "Качвате";
+    } else if (underOrAbove === "above" && Math.abs(difference) >= 2) {
+      recommendedGoal = "Сваляте";
+    }
+
+    return recommendedGoal + " (кг.)";
+  };
 
   handleInputChange = (key, value) => {
     if (
@@ -486,11 +586,29 @@ class MealPlanner extends React.Component {
       }
     };
 
-    const { isLoading, requestFailed, userPreferences } = this.state;
+    const { isLoading, requestFailed, userPreferences, activityLevel } =
+      this.state;
 
+    const levels = [1, 2, 3, 4, 5, 6];
+
+    console.log("activityLevel: ", activityLevel);
     return (
       <View style={styles.container}>
         <ScrollView contentContainerStyle={styles.scrollViewContent}>
+          <View style={styles.buttonContainer}>
+            {levels.map((level) => (
+              <TouchableOpacity
+                key={level}
+                style={[
+                  styles.button,
+                  activityLevel === level ? styles.activeButton : null
+                ]}
+                onPress={() => this.setState({ activityLevel: level })}
+              >
+                <Text style={styles.buttonText}>Ниво {level}</Text>
+              </TouchableOpacity>
+            ))}
+          </View>
           <View style={styles.inputContainer}>
             <TextInput
               placeholder="Cuisine"
@@ -540,7 +658,7 @@ class MealPlanner extends React.Component {
               <ActivityIndicator size="large" color="#0000ff" />
             </View>
           )}
-          {requestFailed && <Text>kuro mi dedov</Text>}
+          {requestFailed && <Text>kuro mi, dedov e</Text>}
           <View style={styles.buttonContainer}>
             <TouchableOpacity
               style={styles.button}

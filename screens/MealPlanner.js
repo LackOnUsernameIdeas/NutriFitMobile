@@ -14,6 +14,7 @@ import RecipeWidget from "../components/RecipeWidget";
 import articles from "../constants/articles";
 const { width } = Dimensions.get("screen");
 import { getAuth } from "firebase/auth";
+import DailyCalorieRequirements from "./DailyCalorieRequirements";
 
 class MealPlanner extends React.Component {
   constructor(props) {
@@ -28,7 +29,14 @@ class MealPlanner extends React.Component {
         Carbohydrates: "",
         Exclude: ""
       },
-      activityLevel: null,
+      activityLevel: 1,
+      userData: {},
+      perfectWeight: null,
+      differenceFromPerfectWeight: null,
+      health: "",
+      recommendedGoal: "",
+      dailyCaloryRequirements: [],
+      macroNutrients: [],
       isPlanGeneratedWithOpenAI: false,
       isPlanGeneratedWithGemini: false,
       mealPlanImages: {},
@@ -586,8 +594,13 @@ class MealPlanner extends React.Component {
       }
     };
 
-    const { isLoading, requestFailed, userPreferences, activityLevel } =
-      this.state;
+    const {
+      isLoading,
+      requestFailed,
+      userPreferences,
+      activityLevel,
+      dailyCaloryRequirements
+    } = this.state;
 
     const levels = [1, 2, 3, 4, 5, 6];
 
@@ -609,6 +622,10 @@ class MealPlanner extends React.Component {
               </TouchableOpacity>
             ))}
           </View>
+          <DailyCalorieRequirements
+            dailyCaloryRequirementsArray={dailyCaloryRequirements}
+            activityLevel={activityLevel}
+          />
           <View style={styles.inputContainer}>
             <TextInput
               placeholder="Cuisine"

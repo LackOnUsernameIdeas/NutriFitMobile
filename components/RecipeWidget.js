@@ -2,7 +2,7 @@ import React from "react";
 import { Image, StyleSheet } from "react-native";
 import { Block, Text, theme } from "galio-framework";
 import PropTypes from "prop-types";
-import { argonTheme } from "../constants";
+import { nutriTheme } from "../constants";
 
 class RecipeWidget extends React.Component {
   render() {
@@ -28,7 +28,7 @@ class RecipeWidget extends React.Component {
           <Text size={15} style={styles.cardTitle} bold>
             {`Grams: ${item.totals.grams}`}
           </Text>
-          <Text size={12} color={argonTheme.COLORS.ACTIVE} bold>
+          <Text size={12} color={nutriTheme.COLORS.ACTIVE} bold>
             {`Calories: ${item.totals.calories}, Protein: ${item.totals.protein}, Fat: ${item.totals.fat}, Carbs: ${item.totals.carbohydrates}`}
           </Text>
         </Block>
@@ -62,7 +62,7 @@ const styles = StyleSheet.create({
     height: 150
   },
   shadow: {
-    shadowColor: argonTheme.COLORS.BLACK,
+    shadowColor: nutriTheme.COLORS.BLACK,
     shadowOffset: {
       width: 0,
       height: 2

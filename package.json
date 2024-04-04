@@ -1,7 +1,7 @@
 {
-  "name": "argon-react-native",
+  "name": "nutrifit-react-native",
   "version": "1.9.0",
-  "description": "Argon React Native, based on Argon Design System. Coded by Creative Tim",
+  "description": "Track your bodily change and create meal plans with the power of AI using NutriFit!",
   "main": "node_modules/expo/AppEntry.js",
   "scripts": {
     "start": "expo start",
@@ -11,7 +11,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/creativetimofficial/argon-react-native.git"
+    "url": "git+https://github.com/LackOnUsernameIdeas/NutriFitMobile.git"
   },
   "dependencies": {
     "@react-native-async-storage/async-storage": "1.17.11",

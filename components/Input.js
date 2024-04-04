@@ -1,11 +1,11 @@
 import React from "react";
 import { StyleSheet } from "react-native";
-import PropTypes from 'prop-types';
+import PropTypes from "prop-types";
 
 import { Input } from "galio-framework";
 
-import Icon from './Icon';
-import { argonTheme } from "../constants";
+import Icon from "./Icon";
+import { nutriTheme } from "../constants";
 
 class ArInput extends React.Component {
   render() {
@@ -16,19 +16,19 @@ class ArInput extends React.Component {
       !shadowless && styles.shadow,
       success && styles.success,
       error && styles.error,
-      {...this.props.style}
+      { ...this.props.style }
     ];
 
     return (
       <Input
         placeholder="write something here"
-        placeholderTextColor={argonTheme.COLORS.MUTED}
+        placeholderTextColor={nutriTheme.COLORS.MUTED}
         style={inputStyles}
-        color={argonTheme.COLORS.HEADER}
+        color={nutriTheme.COLORS.HEADER}
         iconContent={
           <Icon
             size={14}
-            color={argonTheme.COLORS.ICON}
+            color={nutriTheme.COLORS.ICON}
             name="link"
             family="AntDesign"
           />
@@ -49,27 +49,27 @@ ArInput.propTypes = {
   shadowless: PropTypes.bool,
   success: PropTypes.bool,
   error: PropTypes.bool
-}
+};
 
 const styles = StyleSheet.create({
   input: {
     borderRadius: 4,
-    borderColor: argonTheme.COLORS.BORDER,
+    borderColor: nutriTheme.COLORS.BORDER,
     height: 44,
-    backgroundColor: '#FFFFFF'
+    backgroundColor: "#FFFFFF"
   },
   success: {
-    borderColor: argonTheme.COLORS.INPUT_SUCCESS,
+    borderColor: nutriTheme.COLORS.INPUT_SUCCESS
   },
   error: {
-    borderColor: argonTheme.COLORS.INPUT_ERROR,
+    borderColor: nutriTheme.COLORS.INPUT_ERROR
   },
   shadow: {
-    shadowColor: argonTheme.COLORS.BLACK,
+    shadowColor: nutriTheme.COLORS.BLACK,
     shadowOffset: { width: 0, height: 1 },
     shadowRadius: 2,
     shadowOpacity: 0.05,
-    elevation: 2,
+    elevation: 2
   }
 });
 

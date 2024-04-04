@@ -3,7 +3,7 @@ import { StyleSheet, TouchableOpacity, Linking } from "react-native";
 import { Block, Text, theme } from "galio-framework";
 
 import Icon from "./Icon";
-import argonTheme from "../constants/Theme";
+import nutriTheme from "../constants/Theme";
 
 class DrawerItem extends React.Component {
   renderIcon = () => {
@@ -14,9 +14,9 @@ class DrawerItem extends React.Component {
         return (
           <Icon
             name="shop"
-            family="ArgonExtra"
+            family="NutriExtra"
             size={14}
-            color={focused ? "white" : argonTheme.COLORS.PRIMARY}
+            color={focused ? "white" : nutriTheme.COLORS.PRIMARY}
           />
         );
       case "Log out":
@@ -37,13 +37,7 @@ class DrawerItem extends React.Component {
     return (
       <TouchableOpacity
         style={{ height: 60 }}
-        onPress={() =>
-          title == "Getting Started"
-            ? Linking.openURL(
-                "https://demos.creative-tim.com/argon-pro-react-native/docs/"
-              ).catch((err) => console.error("An error occurred", err))
-            : navigation.navigate(title)
-        }
+        onPress={() => navigation.navigate(title)}
       >
         <Block flex row style={containerStyles}>
           <Block middle flex={0.1} style={{ marginRight: 5 }}>
@@ -70,7 +64,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16
   },
   activeStyle: {
-    backgroundColor: argonTheme.COLORS.ACTIVE,
+    backgroundColor: nutriTheme.COLORS.ACTIVE,
     borderRadius: 4
   },
   shadow: {

@@ -9,7 +9,7 @@ import {
 } from "react-native";
 import { Block, Text, theme } from "galio-framework";
 
-import { argonTheme } from "../constants";
+import { nutriTheme } from "../constants";
 
 class Card extends React.Component {
   render() {
@@ -46,7 +46,7 @@ class Card extends React.Component {
             <Text
               size={12}
               muted={!ctaColor}
-              color={ctaColor || argonTheme.COLORS.ACTIVE}
+              color={ctaColor || nutriTheme.COLORS.ACTIVE}
               bold
             >
               {item.cta}

@@ -11,7 +11,6 @@ import {
 import { Block, theme, Text } from "galio-framework";
 import { EXPO_PUBLIC_OPENAI_API_KEY } from "@env";
 import RecipeWidget from "../components/RecipeWidget";
-import articles from "../constants/articles";
 const { width } = Dimensions.get("screen");
 import { getAuth } from "firebase/auth";
 import DailyCalorieRequirements from "./DailyCalorieRequirements";

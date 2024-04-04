@@ -13,20 +13,18 @@ import { enableScreens } from "react-native-screens";
 enableScreens();
 
 import Screens from "./navigation/Screens";
-import { Images, articles, argonTheme } from "./constants";
+import { Images, nutriTheme } from "./constants";
 
 // cache app images
 const assetImages = [
   Images.Onboarding,
   Images.LogoOnboarding,
   Images.Logo,
-  Images.Pro,
-  Images.ArgonLogo,
+  Images.NutriFitLogo,
   Images.iOSLogo,
   Images.androidLogo
 ];
 // cache product images
-articles.map((article) => assetImages.push(article.image));
 
 function cacheImages(images) {
   return images.map((image) => {
@@ -51,7 +49,7 @@ export default function App() {
         await _loadResourcesAsync();
         // Pre-load fonts, make any API calls you need to do here
         await Font.loadAsync({
-          ArgonExtra: require("./assets/font/argon.ttf")
+          NutriExtra: require("./assets/font/nutri.ttf")
         });
       } catch (e) {
         console.warn(e);
@@ -79,7 +77,7 @@ export default function App() {
 
   return (
     <NavigationContainer onReady={onLayoutRootView}>
-      <GalioProvider theme={argonTheme}>
+      <GalioProvider theme={nutriTheme}>
         <Block flex>
           <Screens />
         </Block>

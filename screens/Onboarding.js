@@ -34,17 +34,17 @@ class Onboarding extends React.Component {
             <Block style={styles.title}>
               <Block>
                 <Text color="white" size={60}>
-                  Добре дошли в NutriFit
+                  Добре дошли!
                 </Text>
               </Block>
+            </Block>
+            <Block center>
               <Block style={styles.subTitle}>
                 <Text color="white" size={16}>
                   Бъдете винаги във форма и в оптимално здравословно състояние с
                   помощта на изкуствен интелект!
                 </Text>
               </Block>
-            </Block>
-            <Block center>
               <Button
                 style={styles.button}
                 color={nutriTheme.COLORS.SECONDARY}
@@ -85,7 +85,8 @@ const styles = StyleSheet.create({
     width: width - theme.SIZES.BASE * 4,
     height: theme.SIZES.BASE * 3,
     shadowRadius: 0,
-    shadowOpacity: 0
+    shadowOpacity: 0,
+    borderRadius: 10
   },
   logo: {
     width: 200,
@@ -95,10 +96,10 @@ const styles = StyleSheet.create({
     marginTop: "-50%"
   },
   title: {
-    marginTop: "-25%"
+    marginTop: "-15%"
   },
   subTitle: {
-    marginTop: 20
+    marginBottom: 10
   }
 });
 

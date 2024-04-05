@@ -32,7 +32,7 @@ class MealPlanner extends React.Component {
         Carbohydrates: "",
         Exclude: ""
       },
-      activityLevel: 1,
+      activityLevel: null,
       userData: {},
       perfectWeight: null,
       differenceFromPerfectWeight: null,
@@ -658,83 +658,106 @@ class MealPlanner extends React.Component {
               ))}
             </View>
           </Card>
-          <DailyCalorieRequirements
-            dailyCaloryRequirementsArray={dailyCaloryRequirements}
-            activityLevel={activityLevel}
-            onGoalSelect={this.handleGoalSelect}
-            onCaloriesSelect={this.handleSelectedCalories}
-          />
-          <MacroNutrients
-            macroNutrientsArray={macroNutrients}
-            activityLevel={activityLevel}
-            selectedGoal={this.state.selectedGoal}
-            onDietSelect={this.handleSelectedDiet}
-          />
-          <View style={styles.inputContainer}>
-            <TextInput
-              placeholder="Cuisine"
-              value={userPreferences.Cuisine}
-              onChangeText={(text) => this.handleInputChange("Cuisine", text)}
-              style={styles.input}
-            />
-            <TextInput
-              placeholder="Calories"
-              value={userPreferences.Calories}
-              onChangeText={(text) => this.handleInputChange("Calories", text)}
-              style={styles.input}
-              keyboardType="numeric"
-            />
-            <TextInput
-              placeholder="Protein"
-              value={userPreferences.Protein}
-              onChangeText={(text) => this.handleInputChange("Protein", text)}
-              style={styles.input}
-              keyboardType="numeric"
-            />
-            <TextInput
-              placeholder="Fat"
-              value={userPreferences.Fat}
-              onChangeText={(text) => this.handleInputChange("Fat", text)}
-              style={styles.input}
-              keyboardType="numeric"
-            />
-            <TextInput
-              placeholder="Carbohydrates"
-              value={userPreferences.Carbohydrates}
-              onChangeText={(text) =>
-                this.handleInputChange("Carbohydrates", text)
-              }
-              style={styles.input}
-              keyboardType="numeric"
-            />
-            <TextInput
-              placeholder="Exclude"
-              value={userPreferences.Exclude}
-              onChangeText={(text) => this.handleInputChange("Exclude", text)}
-              style={styles.input}
-            />
-          </View>
-          {isLoading && (
-            <View style={styles.loaderContainer}>
-              <ActivityIndicator size="large" color="#0000ff" />
-            </View>
+          {activityLevel && (
+            <Card>
+              <Text style={styles.title}>
+                Изберете желаната от вас цел и съответните калории, които трябва
+                да приемате на ден според желания резултат:
+              </Text>
+              <DailyCalorieRequirements
+                dailyCaloryRequirementsArray={dailyCaloryRequirements}
+                activityLevel={activityLevel}
+                onGoalSelect={this.handleGoalSelect}
+                onCaloriesSelect={this.handleSelectedCalories}
+              />
+              <MacroNutrients
+                macroNutrientsArray={macroNutrients}
+                activityLevel={activityLevel}
+                selectedGoal={this.state.selectedGoal}
+                onDietSelect={this.handleSelectedDiet}
+              />
+            </Card>
           )}
-          {requestFailed && <Text>kuro mi, dedov e</Text>}
-          <View style={styles.buttonContainer}>
-            <TouchableOpacity
-              style={styles.button}
-              onPress={generatePlanWithOpenAI}
-            >
-              <Text style={styles.buttonText}>Generate with OpenAI</Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={styles.button}
-              onPress={generatePlanWithGemini}
-            >
-              <Text style={styles.buttonText}>Generate with Gemini</Text>
-            </TouchableOpacity>
-          </View>
+          {userPreferences.Diet && (
+            <Card style={{ marginBottom: 20 }}>
+              <Text style={styles.title} size={25}>
+                Създайте хранителен план с NutriFit
+              </Text>
+              <View style={styles.inputContainer}>
+                <TextInput
+                  placeholder="Cuisine"
+                  value={userPreferences.Cuisine}
+                  onChangeText={(text) =>
+                    this.handleInputChange("Cuisine", text)
+                  }
+                  style={styles.input}
+                />
+                <TextInput
+                  placeholder="Calories"
+                  value={userPreferences.Calories}
+                  onChangeText={(text) =>
+                    this.handleInputChange("Calories", text)
+                  }
+                  style={styles.input}
+                  keyboardType="numeric"
+                />
+                <TextInput
+                  placeholder="Protein"
+                  value={userPreferences.Protein}
+                  onChangeText={(text) =>
+                    this.handleInputChange("Protein", text)
+                  }
+                  style={styles.input}
+                  keyboardType="numeric"
+                />
+                <TextInput
+                  placeholder="Fat"
+                  value={userPreferences.Fat}
+                  onChangeText={(text) => this.handleInputChange("Fat", text)}
+                  style={styles.input}
+                  keyboardType="numeric"
+                />
+                <TextInput
+                  placeholder="Carbohydrates"
+                  value={userPreferences.Carbohydrates}
+                  onChangeText={(text) =>
+                    this.handleInputChange("Carbohydrates", text)
+                  }
+                  style={styles.input}
+                  keyboardType="numeric"
+                />
+                <TextInput
+                  placeholder="Exclude"
+                  value={userPreferences.Exclude}
+                  onChangeText={(text) =>
+                    this.handleInputChange("Exclude", text)
+                  }
+                  style={styles.input}
+                />
+              </View>
 
+              {isLoading && (
+                <View style={styles.loaderContainer}>
+                  <ActivityIndicator size="large" color="#0000ff" />
+                </View>
+              )}
+              {requestFailed && <Text>kuro mi, dedov e</Text>}
+              <View style={styles.buttonContainer}>
+                <TouchableOpacity
+                  style={styles.button}
+                  onPress={generatePlanWithOpenAI}
+                >
+                  <Text style={styles.buttonText}>Generate with OpenAI</Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  style={styles.button}
+                  onPress={generatePlanWithGemini}
+                >
+                  <Text style={styles.buttonText}>Generate with Gemini</Text>
+                </TouchableOpacity>
+              </View>
+            </Card>
+          )}
           {Object.keys(this.state.mealPlan).map((mealType, index) => {
             const meal = this.state.mealPlan[mealType];
             const mealImages = this.state.mealPlanImages[mealType]; // Get all images for the meal type
@@ -781,7 +804,6 @@ const styles = StyleSheet.create({
   },
   inputContainer: {
     paddingHorizontal: 20,
-    paddingTop: 20,
     paddingBottom: 20
   },
   input: {
@@ -799,7 +821,7 @@ const styles = StyleSheet.create({
   },
   button: {
     flex: 1,
-    backgroundColor: "blue",
+    backgroundColor: "#9a99ff",
     borderRadius: 10,
     justifyContent: "center",
     marginHorizontal: 5
@@ -815,11 +837,11 @@ const styles = StyleSheet.create({
     alignItems: "center"
   },
   title: {
+    textAlign: "center",
     lineHeight: 19,
-    fontWeight: "400",
+    fontWeight: "bold", // Change fontWeight to "bold" for a heavier font
     color: nutriTheme.COLORS.HEADER,
-    marginTop: 10,
-    marginBottom: 10
+    margin: 10
   }
 });
 

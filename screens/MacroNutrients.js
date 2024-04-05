@@ -7,11 +7,12 @@ class MacroNutrients extends Component {
     this.state = {
       tooltipVisible: false,
       tooltipName: "",
-      selectedGoal: ""
+      selectedDiet: null // Add selectedDiet in state
     };
   }
 
   handleDietClicked = (diet) => {
+    this.setState({ selectedDiet: diet.name }); // Update selectedDiet in state
     this.props.onDietSelect(diet.protein, diet.fat, diet.carbs, diet.name);
     this.showTooltip(diet.name);
   };
@@ -75,7 +76,7 @@ class MacroNutrients extends Component {
               style={({ pressed }) => [
                 styles.row,
                 pressed && styles.pressedRow,
-                this.state.selectedDiet === item.name && styles.selectedRow
+                this.state.selectedDiet === item.name && styles.selectedRow // Apply selectedRow style when selectedDiet matches
               ]}
               onPress={() => this.handleDietClicked(item)}
               onPressIn={() => this.showTooltip(item.name)}
@@ -103,9 +104,10 @@ class MacroNutrients extends Component {
 
 const styles = StyleSheet.create({
   container: {
+    marginBottom: 18,
     flex: 1,
-    marginTop: 20,
-    marginHorizontal: 10
+    marginTop: 10,
+    marginHorizontal: 20
   },
   header: {
     fontSize: 20,
@@ -128,7 +130,8 @@ const styles = StyleSheet.create({
     opacity: 0.5
   },
   selectedRow: {
-    backgroundColor: "#e0e0e0"
+    borderColor: "#9a99ff", // Set border color to your desired color
+    backgroundColor: "#CFD2DB"
   },
   cell: {
     flex: 1
@@ -148,15 +151,6 @@ const styles = StyleSheet.create({
   },
   tooltipText: {
     color: "#fff"
-  },
-  selectedValuesContainer: {
-    marginTop: 20,
-    padding: 10,
-    backgroundColor: "#f0f0f0",
-    borderRadius: 5
-  },
-  selectedValuesText: {
-    fontSize: 16
   }
 });
 

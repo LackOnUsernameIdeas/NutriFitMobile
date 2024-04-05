@@ -1,0 +1,163 @@
+import React, { Component } from "react";
+import { Text, StyleSheet, View, Pressable } from "react-native";
+
+class MacroNutrients extends Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      tooltipVisible: false,
+      tooltipName: "",
+      selectedGoal: ""
+    };
+  }
+
+  handleDietClicked = (diet) => {
+    this.props.onDietSelect(diet.protein, diet.fat, diet.carbs, diet.name);
+    this.showTooltip(diet.name);
+  };
+
+  showTooltip = (name) => {
+    this.setState({ tooltipVisible: true, tooltipName: name });
+  };
+
+  hideTooltip = () => {
+    this.setState({ tooltipVisible: false });
+  };
+
+  render() {
+    const { macroNutrientsArray, activityLevel, selectedGoal } = this.props;
+
+    let tableData = [];
+    if (macroNutrientsArray[activityLevel - 1]) {
+      macroNutrientsArray[activityLevel - 1].goals.forEach((item) => {
+        const { goal, balanced, highprotein, lowcarbs, lowfat } = item;
+
+        if (goal === selectedGoal) {
+          const savedData = [
+            {
+              name: "Балансирана",
+              protein: balanced.protein.toFixed(2),
+              fat: balanced.fat.toFixed(2),
+              carbs: balanced.carbs.toFixed(2)
+            },
+            {
+              name: "Ниско съдържание на мазнини",
+              protein: lowfat.protein.toFixed(2),
+              fat: lowfat.fat.toFixed(2),
+              carbs: lowfat.carbs.toFixed(2)
+            },
+            {
+              name: "Ниско съдържание на въглехидрати",
+              protein: lowcarbs.protein.toFixed(2),
+              fat: lowcarbs.fat.toFixed(2),
+              carbs: lowcarbs.carbs.toFixed(2)
+            },
+            {
+              name: "Високо съдържание на протеин",
+              protein: highprotein.protein.toFixed(2),
+              fat: highprotein.fat.toFixed(2),
+              carbs: highprotein.carbs.toFixed(2)
+            }
+          ];
+
+          tableData = savedData;
+        }
+      });
+    }
+
+    return (
+      <View style={styles.container}>
+        <Text style={styles.header}>Изберете тип диета:</Text>
+        <View style={styles.table}>
+          {tableData.map((item, index) => (
+            <Pressable
+              key={index}
+              style={({ pressed }) => [
+                styles.row,
+                pressed && styles.pressedRow,
+                this.state.selectedDiet === item.name && styles.selectedRow
+              ]}
+              onPress={() => this.handleDietClicked(item)}
+              onPressIn={() => this.showTooltip(item.name)}
+              onPressOut={this.hideTooltip}
+              delayLongPress={1000}
+            >
+              <Text style={[styles.cell, styles.nameCell]} numberOfLines={1}>
+                {item.name}
+              </Text>
+              <Text style={styles.cell}>{item.protein}</Text>
+              <Text style={styles.cell}>{item.fat}</Text>
+              <Text style={styles.cell}>{item.carbs}</Text>
+            </Pressable>
+          ))}
+        </View>
+        {this.state.tooltipVisible && (
+          <View style={styles.tooltip}>
+            <Text style={styles.tooltipText}>{this.state.tooltipName}</Text>
+          </View>
+        )}
+      </View>
+    );
+  }
+}
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    marginTop: 20,
+    marginHorizontal: 10
+  },
+  header: {
+    fontSize: 20,
+    fontWeight: "bold",
+    marginBottom: 10
+  },
+  table: {
+    borderWidth: 1,
+    borderColor: "black",
+    flexDirection: "column"
+  },
+  row: {
+    flexDirection: "row",
+    borderBottomWidth: 1,
+    borderBottomColor: "black",
+    paddingVertical: 10,
+    paddingHorizontal: 5
+  },
+  pressedRow: {
+    opacity: 0.5
+  },
+  selectedRow: {
+    backgroundColor: "#e0e0e0"
+  },
+  cell: {
+    flex: 1
+  },
+  nameCell: {
+    flex: 2 // Adjust the flex value as needed to fit the name column
+  },
+  tooltip: {
+    position: "absolute",
+    backgroundColor: "rgba(0, 0, 0, 0.7)",
+    padding: 10,
+    borderRadius: 5,
+    alignSelf: "center",
+    top: "50%",
+    zIndex: 999,
+    elevation: 5
+  },
+  tooltipText: {
+    color: "#fff"
+  },
+  selectedValuesContainer: {
+    marginTop: 20,
+    padding: 10,
+    backgroundColor: "#f0f0f0",
+    borderRadius: 5
+  },
+  selectedValuesText: {
+    fontSize: 16
+  }
+});
+
+export default MacroNutrients;

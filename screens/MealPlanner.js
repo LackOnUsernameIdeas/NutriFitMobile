@@ -16,6 +16,7 @@ import { getAuth } from "firebase/auth";
 import DailyCalorieRequirements from "./DailyCalorieRequirements";
 import { Card } from "../components";
 import { nutriTheme } from "../constants";
+import MacroNutrients from "./MacroNutrients";
 
 class MealPlanner extends React.Component {
   constructor(props) {
@@ -24,6 +25,7 @@ class MealPlanner extends React.Component {
       currentUser: null,
       userPreferences: {
         Cuisine: "",
+        Diet: "",
         Calories: "",
         Protein: "",
         Fat: "",
@@ -36,6 +38,7 @@ class MealPlanner extends React.Component {
       differenceFromPerfectWeight: null,
       health: "",
       recommendedGoal: "",
+      selectedGoal: "",
       dailyCaloryRequirements: [],
       macroNutrients: [],
       isPlanGeneratedWithOpenAI: false,
@@ -169,7 +172,34 @@ class MealPlanner extends React.Component {
     }
   };
 
+  handleGoalSelect = (goal) => {
+    this.setState({ selectedGoal: goal });
+  };
+
+  handleSelectedCalories = (calories) => {
+    this.setState((prevState) => ({
+      userPreferences: {
+        ...prevState.userPreferences,
+        Calories: calories
+      }
+    }));
+  };
+
+  handleSelectedDiet = (protein, fat, carbs, dietName) => {
+    this.setState((prevState) => ({
+      userPreferences: {
+        ...prevState.userPreferences,
+        Protein: protein,
+        Fat: fat,
+        Carbohydrates: carbs,
+        Diet: dietName
+      }
+    }));
+  };
+
   render() {
+    console.log("userPreferences: ", this.state.userPreferences);
+
     const cuisineTranslation = {
       Italian: "Италианска",
       Bulgarian: "Българска",
@@ -600,7 +630,8 @@ class MealPlanner extends React.Component {
       requestFailed,
       userPreferences,
       activityLevel,
-      dailyCaloryRequirements
+      dailyCaloryRequirements,
+      macroNutrients
     } = this.state;
 
     const levels = [1, 2, 3, 4, 5, 6];
@@ -630,6 +661,14 @@ class MealPlanner extends React.Component {
           <DailyCalorieRequirements
             dailyCaloryRequirementsArray={dailyCaloryRequirements}
             activityLevel={activityLevel}
+            onGoalSelect={this.handleGoalSelect}
+            onCaloriesSelect={this.handleSelectedCalories}
+          />
+          <MacroNutrients
+            macroNutrientsArray={macroNutrients}
+            activityLevel={activityLevel}
+            selectedGoal={this.state.selectedGoal}
+            onDietSelect={this.handleSelectedDiet}
           />
           <View style={styles.inputContainer}>
             <TextInput

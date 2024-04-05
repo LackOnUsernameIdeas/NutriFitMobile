@@ -2,85 +2,135 @@ import React, { Component } from "react";
 import { Text, StyleSheet, View, TouchableOpacity } from "react-native";
 
 class DailyCalorieRequirements extends Component {
+  constructor(props) {
+    super(props);
+  }
+
+  // Function to handle button click and update state with clicked calories
+  handleCaloriesButtonClick = (calories, goal) => {
+    this.props.onCaloriesSelect(calories);
+    this.props.onGoalSelect(goal);
+  };
+
   render() {
     const { dailyCaloryRequirementsArray, activityLevel } = this.props;
     const selectedLevelData = dailyCaloryRequirementsArray[activityLevel - 1];
 
     return (
-      <View style={styles.buttonContainer}>
-        <TouchableOpacity
-          style={[styles.button]}
-          onPress={() => console.log("Базов метаболизъм")}
-        >
+      <View style={styles.container}>
+        <TouchableOpacity style={[styles.button, styles.bmrButton]}>
           <Text style={styles.buttonText}>
-            Базов метаболизъм {selectedLevelData?.BMR.toFixed(2) + " kcal"}
+            Базов метаболизъм{"\n"}
+            {selectedLevelData?.BMR.toFixed(2) + " kcal"}
           </Text>
         </TouchableOpacity>
+
         <TouchableOpacity
-          style={[styles.button]}
-          onPress={() => console.log("Леко сваляне на тегло")}
+          style={[styles.button, styles.weightLossButton]}
+          onPress={() =>
+            this.handleCaloriesButtonClick(
+              selectedLevelData?.goals["Mild weight loss"].calory.toFixed(2),
+              "mildlose"
+            )
+          }
         >
           <Text style={styles.buttonText}>
-            Леко сваляне на тегло{" "}
+            Леко сваляне на тегло{"\n"}
             {selectedLevelData?.goals["Mild weight loss"].calory.toFixed(2) +
               " kcal"}
           </Text>
         </TouchableOpacity>
+
         <TouchableOpacity
-          style={[styles.button]}
-          onPress={() => console.log("Сваляне на тегло")}
+          style={[styles.button, styles.weightLossButton]}
+          onPress={() =>
+            this.handleCaloriesButtonClick(
+              selectedLevelData?.goals["Weight loss"].calory.toFixed(2),
+              "weightlose"
+            )
+          }
         >
           <Text style={styles.buttonText}>
-            Сваляне на тегло{" "}
+            Сваляне на тегло{"\n"}
             {selectedLevelData?.goals["Weight loss"].calory.toFixed(2) +
               " kcal"}
           </Text>
         </TouchableOpacity>
+
         <TouchableOpacity
-          style={[styles.button]}
-          onPress={() => console.log("Екстремно сваляне на тегло")}
+          style={[styles.button, styles.weightLossButton]}
+          onPress={() =>
+            this.handleCaloriesButtonClick(
+              selectedLevelData?.goals["Extreme weight loss"].calory.toFixed(2),
+              "extremelose"
+            )
+          }
         >
           <Text style={styles.buttonText}>
-            Екстремно сваляне на тегло{" "}
+            Екстремно сваляне на тегло{"\n"}
             {selectedLevelData?.goals["Extreme weight loss"].calory.toFixed(2) +
               " kcal"}
           </Text>
         </TouchableOpacity>
+
         <TouchableOpacity
-          style={[styles.button]}
-          onPress={() => console.log("Запазване на тегло")}
+          style={[styles.button, styles.weightMaintainButton]}
+          onPress={() =>
+            this.handleCaloriesButtonClick(
+              selectedLevelData?.goals["maintain weight"].toFixed(2),
+              "maintain"
+            )
+          }
         >
           <Text style={styles.buttonText}>
-            Запазване на тегло{" "}
+            Запазване на тегло{"\n"}
             {selectedLevelData?.goals["maintain weight"].toFixed(2) + " kcal"}
           </Text>
         </TouchableOpacity>
+
         <TouchableOpacity
-          style={[styles.button]}
-          onPress={() => console.log("Леко качване на тегло")}
+          style={[styles.button, styles.weightGainButton]}
+          onPress={() =>
+            this.handleCaloriesButtonClick(
+              selectedLevelData?.goals["Mild weight gain"].calory.toFixed(2),
+              "mildgain"
+            )
+          }
         >
           <Text style={styles.buttonText}>
-            Леко качване на тегло{" "}
+            Леко качване на тегло{"\n"}
             {selectedLevelData?.goals["Mild weight gain"].calory.toFixed(2) +
               " kcal"}
           </Text>
         </TouchableOpacity>
+
         <TouchableOpacity
-          style={[styles.button]}
-          onPress={() => console.log("Качване на тегло")}
+          style={[styles.button, styles.weightGainButton]}
+          onPress={() =>
+            this.handleCaloriesButtonClick(
+              selectedLevelData?.goals["Weight gain"].calory.toFixed(2),
+              "weightgain"
+            )
+          }
         >
           <Text style={styles.buttonText}>
-            Качване на тегло{" "}
+            Качване на тегло{"\n"}
             {selectedLevelData?.goals["Weight gain"].calory.toFixed(2) +
               " kcal"}
           </Text>
         </TouchableOpacity>
+
         <TouchableOpacity
-          style={[styles.button]}
-          onPress={() => console.log("Екстремно качване на тегло")}
+          style={[styles.button, styles.weightGainButton]}
+          onPress={() =>
+            this.handleCaloriesButtonClick(
+              selectedLevelData?.goals["Extreme weight gain"].calory.toFixed(2),
+              "extremegain"
+            )
+          }
         >
           <Text style={styles.buttonText}>
-            Екстремно качване на тегло{" "}
+            Екстремно качване на тегло{"\n"}
             {selectedLevelData?.goals["Extreme weight gain"].calory.toFixed(2) +
               " kcal"}
           </Text>
@@ -91,20 +141,38 @@ class DailyCalorieRequirements extends Component {
 }
 
 const styles = StyleSheet.create({
+  container: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    justifyContent: "center",
+    alignItems: "center"
+  },
   button: {
-    paddingVertical: 10,
-    paddingHorizontal: 20,
-    borderRadius: 5,
+    width: "45%",
+    height: "20%",
+    margin: "2.5%",
+    padding: 15,
+    borderRadius: 10,
     borderWidth: 1,
-    borderColor: "gray"
+    borderColor: "gray",
+    alignItems: "center"
   },
   buttonText: {
     fontSize: 16,
-    fontWeight: "bold"
+    fontWeight: "bold",
+    textAlign: "center"
   },
-  activeButton: {
-    backgroundColor: "blue",
-    borderColor: "blue"
+  bmrButton: {
+    backgroundColor: "#4CAF50"
+  },
+  weightLossButton: {
+    backgroundColor: "#FF9800"
+  },
+  weightMaintainButton: {
+    backgroundColor: "#2196F3"
+  },
+  weightGainButton: {
+    backgroundColor: "#F44336"
   }
 });
 

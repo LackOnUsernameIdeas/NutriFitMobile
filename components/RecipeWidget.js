@@ -26,10 +26,10 @@ class RecipeWidget extends React.Component {
             {item.name}
           </Text>
           <Text size={15} style={styles.cardTitle} bold>
-            {`Grams: ${item.totals.grams}`}
+            {`Грамаж: ${item.totals.grams}г.`}
           </Text>
           <Text size={12} color={nutriTheme.COLORS.ACTIVE} bold>
-            {`Calories: ${item.totals.calories}, Protein: ${item.totals.protein}, Fat: ${item.totals.fat}, Carbs: ${item.totals.carbohydrates}`}
+            {`Калории: ${item.totals.calories} Протеин: ${item.totals.protein} Мазнини: ${item.totals.fat} Въглехидрати: ${item.totals.carbohydrates}`}
           </Text>
         </Block>
       </Block>

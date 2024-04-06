@@ -6,7 +6,8 @@ import {
   TouchableOpacity,
   View,
   TextInput,
-  ActivityIndicator
+  ActivityIndicator,
+  Button
 } from "react-native";
 import { Picker } from "@react-native-picker/picker";
 import { Block, Text } from "galio-framework";
@@ -18,6 +19,7 @@ import { Card } from "../components";
 import { nutriTheme } from "../constants";
 import MacroNutrients from "./MacroNutrients";
 import CustomDropdown from "../components/Dropdown";
+import { Ionicons } from "@expo/vector-icons";
 
 class MealPlanner extends React.Component {
   constructor(props) {
@@ -48,7 +50,9 @@ class MealPlanner extends React.Component {
       mealPlan: {},
       requestFailed: false,
       isLoading: false,
-      isDailyCaloryLoading: true
+      isDailyCaloryLoading: true,
+      currentPage: 0,
+      itemsPerPage: 5
     };
   }
 
@@ -628,6 +632,31 @@ class MealPlanner extends React.Component {
       }
     };
 
+    goToPreviousPage = () => {
+      this.setState((prevState) => ({
+        currentPage: prevState.currentPage - 1
+      }));
+    };
+
+    goToNextPage = () => {
+      this.setState((prevState) => ({
+        currentPage: prevState.currentPage + 1
+      }));
+    };
+
+    translateMealType = (mealType) => {
+      switch (mealType) {
+        case "breakfast":
+          return "Закуска";
+        case "lunch":
+          return "Обяд";
+        case "dinner":
+          return "Вечеря";
+        default:
+          return mealType; // Return the original meal type if translation is not available
+      }
+    };
+
     const {
       isLoading,
       isDailyCaloryLoading,
@@ -635,12 +664,17 @@ class MealPlanner extends React.Component {
       userPreferences,
       activityLevel,
       dailyCaloryRequirements,
-      macroNutrients
+      macroNutrients,
+      currentPage,
+      itemsPerPage
     } = this.state;
 
     const levels = [1, 2, 3, 4, 5, 6];
 
     console.log("activityLevel: ", activityLevel);
+
+    const startIndex = currentPage * itemsPerPage;
+    const endIndex = startIndex + itemsPerPage;
 
     return (
       <View style={styles.container}>
@@ -776,27 +810,64 @@ class MealPlanner extends React.Component {
 
             return (
               <React.Fragment key={index}>
-                {/* Map through each item in the meal type */}
-                {Object.keys(meal).map((itemType) => {
-                  const item = meal[itemType]; // Get the item details
-                  const mealImage = mealImages ? mealImages[itemType] : null; // Get the image for the item
+                {/* Check if the current meal type is within the current page */}
+                {index === currentPage && (
+                  <React.Fragment>
+                    {Object.keys(this.state.mealPlan).length !== 0 && (
+                      <React.Fragment>
+                        <Text style={styles.mealType}>
+                          {translateMealType(mealType).toUpperCase()}
+                        </Text>
+                        <View style={styles.paginationContainer}>
+                          <TouchableOpacity
+                            onPress={goToPreviousPage}
+                            disabled={currentPage === 0}
+                          >
+                            <Ionicons
+                              name="ios-arrow-back"
+                              size={24}
+                              color={currentPage === 0 ? "gray" : "black"}
+                            />
+                          </TouchableOpacity>
+                          <Text>Страница {currentPage + 1} от 3</Text>
+                          <TouchableOpacity
+                            onPress={goToNextPage}
+                            disabled={currentPage === 2}
+                          >
+                            <Ionicons
+                              name="ios-arrow-forward"
+                              size={24}
+                              color={currentPage === 2 ? "gray" : "black"}
+                            />
+                          </TouchableOpacity>
+                        </View>
+                      </React.Fragment>
+                    )}
+                    {/* Map through each item in the meal type */}
+                    {meal &&
+                      Object.keys(meal).map((itemType) => {
+                        const item = meal[itemType]; // Get the item details
+                        const mealImage = mealImages
+                          ? mealImages[itemType]
+                          : null; // Get the image for the item
 
-                  // Check if item exists before rendering RecipeWidget
-                  if (item) {
-                    return (
-                      <Block style={styles.inputContainer}>
-                        <RecipeWidget
-                          key={`${mealType}-${itemType}`}
-                          image={mealImage}
-                          item={item}
-                        />
-                      </Block>
-                    );
-                  } else {
-                    // Handle case where item is undefined
-                    return null;
-                  }
-                })}
+                        // Check if item exists before rendering RecipeWidget
+                        if (item) {
+                          return (
+                            <Block
+                              style={styles.inputContainer}
+                              key={`${mealType}-${itemType}`}
+                            >
+                              <RecipeWidget image={mealImage} item={item} />
+                            </Block>
+                          );
+                        } else {
+                          // Handle case where item is undefined
+                          return null;
+                        }
+                      })}
+                  </React.Fragment>
+                )}
               </React.Fragment>
             );
           })}
@@ -809,6 +880,19 @@ class MealPlanner extends React.Component {
 const styles = StyleSheet.create({
   container: {
     flex: 1
+  },
+  mealType: {
+    fontWeight: "bold",
+    fontSize: 30,
+    marginTop: 5,
+    textAlign: "center"
+  },
+  paginationContainer: {
+    flexDirection: "row",
+    justifyContent: "center",
+    alignItems: "center",
+    marginVertical: 15,
+    gap: 10
   },
   scrollViewContent: {
     flexGrow: 1

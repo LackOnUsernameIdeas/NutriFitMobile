@@ -47,11 +47,10 @@ RecipeWidget.propTypes = {
 const styles = StyleSheet.create({
   card: {
     backgroundColor: theme.COLORS.WHITE,
-    marginVertical: theme.SIZES.BASE,
     borderWidth: 0,
     borderRadius: 15,
     minHeight: 114,
-    marginBottom: 16
+    marginTop: 5
   },
   imageContainer: {
     borderRadius: 15,

@@ -1,13 +1,25 @@
 import React, { Component } from "react";
 import { Text, StyleSheet, View, TouchableOpacity } from "react-native";
+import Spinner from "react-native-loading-spinner-overlay";
+import { Card } from "../components";
+import { Block } from "galio-framework";
 
 class DailyCalorieRequirements extends Component {
   constructor(props) {
     super(props);
     this.state = {
       selectedButtonIndex: null
+      //loading: true // Initially set loading to true
     };
   }
+
+  // componentDidMount() {
+  //   // Check if the dailyCaloryRequirementsArray prop exists
+  //   if (this.props.dailyCaloryRequirementsArray) {
+  //     // If the prop exists, stop loading
+  //     this.setState({ loading: false });
+  //   }
+  // }
 
   // Function to handle button click and update state with clicked calories
   handleCaloriesButtonClick = (index, calories, goal) => {
@@ -18,31 +30,29 @@ class DailyCalorieRequirements extends Component {
 
   render() {
     const { dailyCaloryRequirementsArray, activityLevel } = this.props;
+    // const { loading } = this.state;
+
+    // if (loading) {
+    //   // Render spinner while loading
+    //   return (
+    //     <Spinner
+    //       visible={true}
+    //       textContent={"Зареждане..."}
+    //       textStyle={styles.spinnerText}
+    //     />
+    //   );
+    // }
+
     const selectedLevelData = dailyCaloryRequirementsArray[activityLevel - 1];
 
     return (
       <View style={styles.container}>
-        <TouchableOpacity
-          style={[
-            styles.button,
-            //styles.bmrButton,
-            this.state.selectedButtonIndex === 0
-              ? { borderColor: "#9a99ff", backgroundColor: "#CFD2DB" }
-              : null
-          ]}
-          onPress={() =>
-            this.handleCaloriesButtonClick(
-              0,
-              selectedLevelData?.BMR.toFixed(2),
-              "bmr"
-            )
-          }
-        >
+        <Block style={[styles.bmrButton]}>
           <Text style={styles.buttonText}>Базов метаболизъм</Text>
           <Text style={styles.buttonValue}>
             {selectedLevelData?.BMR.toFixed(2) + " kcal"}
           </Text>
-        </TouchableOpacity>
+        </Block>
 
         <TouchableOpacity
           style={[
@@ -238,8 +248,13 @@ const styles = StyleSheet.create({
     textAlign: "center"
   },
   bmrButton: {
-    //backgroundColor: "#4CAF50"
-    backgroundColor: "#4CAF50"
+    width: "45%",
+    height: "20%",
+    margin: "2.5%",
+    padding: 15,
+    borderRadius: 10,
+    alignItems: "center",
+    backgroundColor: "#FFFFFF"
   },
   weightLossButton: {
     //backgroundColor: "#FF9800"
@@ -252,6 +267,9 @@ const styles = StyleSheet.create({
   weightGainButton: {
     //backgroundColor: "#F44336"
     backgroundColor: "#F44336"
+  },
+  spinnerText: {
+    color: "#FFF"
   }
 });
 

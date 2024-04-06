@@ -8,15 +8,16 @@ import {
   TextInput,
   ActivityIndicator
 } from "react-native";
-import { Block, theme, Text } from "galio-framework";
+import { Picker } from "@react-native-picker/picker";
+import { Block, Text } from "galio-framework";
 import { EXPO_PUBLIC_OPENAI_API_KEY } from "@env";
 import RecipeWidget from "../components/RecipeWidget";
-const { width } = Dimensions.get("screen");
 import { getAuth } from "firebase/auth";
 import DailyCalorieRequirements from "./DailyCalorieRequirements";
 import { Card } from "../components";
 import { nutriTheme } from "../constants";
 import MacroNutrients from "./MacroNutrients";
+import CustomDropdown from "../components/Dropdown";
 
 class MealPlanner extends React.Component {
   constructor(props) {
@@ -46,7 +47,8 @@ class MealPlanner extends React.Component {
       mealPlanImages: {},
       mealPlan: {},
       requestFailed: false,
-      isLoading: false
+      isLoading: false,
+      isDailyCaloryLoading: true
     };
   }
 
@@ -123,7 +125,8 @@ class MealPlanner extends React.Component {
           weightStatsData.differenceFromPerfectWeight
         ),
         dailyCaloryRequirements: weightStatsData.dailyCaloryRequirements,
-        macroNutrients: weightStatsData.macroNutrientsData
+        macroNutrients: weightStatsData.macroNutrientsData,
+        isDailyCaloryLoading: false
       });
     } catch (error) {
       console.error("Error fetching weight stats:", error);
@@ -627,6 +630,7 @@ class MealPlanner extends React.Component {
 
     const {
       isLoading,
+      isDailyCaloryLoading,
       requestFailed,
       userPreferences,
       activityLevel,
@@ -659,17 +663,23 @@ class MealPlanner extends React.Component {
             </View>
           </Card>
           {activityLevel && (
-            <Card>
+            <Card style={{ marginBottom: 20 }}>
               <Text style={styles.title}>
                 Изберете желаната от вас цел и съответните калории, които трябва
                 да приемате на ден според желания резултат:
               </Text>
-              <DailyCalorieRequirements
-                dailyCaloryRequirementsArray={dailyCaloryRequirements}
-                activityLevel={activityLevel}
-                onGoalSelect={this.handleGoalSelect}
-                onCaloriesSelect={this.handleSelectedCalories}
-              />
+              {isDailyCaloryLoading ? (
+                <View style={styles.loaderContainer}>
+                  <ActivityIndicator size="large" color="#0000ff" />
+                </View>
+              ) : (
+                <DailyCalorieRequirements
+                  dailyCaloryRequirementsArray={dailyCaloryRequirements}
+                  activityLevel={activityLevel}
+                  onGoalSelect={this.handleGoalSelect}
+                  onCaloriesSelect={this.handleSelectedCalories}
+                />
+              )}
               <MacroNutrients
                 macroNutrientsArray={macroNutrients}
                 activityLevel={activityLevel}
@@ -679,21 +689,13 @@ class MealPlanner extends React.Component {
             </Card>
           )}
           {userPreferences.Diet && (
-            <Card style={{ marginBottom: 20 }}>
-              <Text style={styles.title} size={25}>
+            <Card style={{ marginBottom: 20, marginTop: -5 }}>
+              <Text style={styles.title} size={20}>
                 Създайте хранителен план с NutriFit
               </Text>
               <View style={styles.inputContainer}>
                 <TextInput
-                  placeholder="Cuisine"
-                  value={userPreferences.Cuisine}
-                  onChangeText={(text) =>
-                    this.handleInputChange("Cuisine", text)
-                  }
-                  style={styles.input}
-                />
-                <TextInput
-                  placeholder="Calories"
+                  placeholder="Калории"
                   value={userPreferences.Calories}
                   onChangeText={(text) =>
                     this.handleInputChange("Calories", text)
@@ -702,7 +704,7 @@ class MealPlanner extends React.Component {
                   keyboardType="numeric"
                 />
                 <TextInput
-                  placeholder="Protein"
+                  placeholder="Протеини"
                   value={userPreferences.Protein}
                   onChangeText={(text) =>
                     this.handleInputChange("Protein", text)
@@ -711,14 +713,14 @@ class MealPlanner extends React.Component {
                   keyboardType="numeric"
                 />
                 <TextInput
-                  placeholder="Fat"
+                  placeholder="Мазнини"
                   value={userPreferences.Fat}
                   onChangeText={(text) => this.handleInputChange("Fat", text)}
                   style={styles.input}
                   keyboardType="numeric"
                 />
                 <TextInput
-                  placeholder="Carbohydrates"
+                  placeholder="Въглехидрати"
                   value={userPreferences.Carbohydrates}
                   onChangeText={(text) =>
                     this.handleInputChange("Carbohydrates", text)
@@ -727,13 +729,14 @@ class MealPlanner extends React.Component {
                   keyboardType="numeric"
                 />
                 <TextInput
-                  placeholder="Exclude"
+                  placeholder="Какво да не се включва"
                   value={userPreferences.Exclude}
                   onChangeText={(text) =>
                     this.handleInputChange("Exclude", text)
                   }
                   style={styles.input}
                 />
+                <CustomDropdown />
               </View>
 
               {isLoading && (
@@ -741,19 +744,28 @@ class MealPlanner extends React.Component {
                   <ActivityIndicator size="large" color="#0000ff" />
                 </View>
               )}
-              {requestFailed && <Text>kuro mi, dedov e</Text>}
-              <View style={styles.buttonContainer}>
+              {requestFailed && (
+                <Text style={styles.title} size={20}>
+                  Не намерихме подходящ хранителен план за вас :( Опитайте
+                  отново.
+                </Text>
+              )}
+              <View style={[styles.buttonContainer, { gap: 10 }]}>
                 <TouchableOpacity
-                  style={styles.button}
+                  style={[styles.button, { marginHorizontal: 0 }]}
                   onPress={generatePlanWithOpenAI}
                 >
-                  <Text style={styles.buttonText}>Generate with OpenAI</Text>
+                  <Text style={styles.buttonText}>
+                    Създайте хранителен план с OpenAI
+                  </Text>
                 </TouchableOpacity>
                 <TouchableOpacity
-                  style={styles.button}
+                  style={[styles.button, { marginHorizontal: 0 }]}
                   onPress={generatePlanWithGemini}
                 >
-                  <Text style={styles.buttonText}>Generate with Gemini</Text>
+                  <Text style={styles.buttonText}>
+                    Създайте хранителен план с Gemini
+                  </Text>
                 </TouchableOpacity>
               </View>
             </Card>
@@ -799,12 +811,11 @@ const styles = StyleSheet.create({
     flex: 1
   },
   scrollViewContent: {
-    flexGrow: 1,
-    justifyContent: "space-between"
+    flexGrow: 1
   },
   inputContainer: {
     paddingHorizontal: 20,
-    paddingBottom: 20
+    paddingBottom: 15
   },
   input: {
     borderWidth: 1,
@@ -832,6 +843,7 @@ const styles = StyleSheet.create({
     fontSize: 18
   },
   loaderContainer: {
+    marginBottom: 30,
     flex: 1,
     justifyContent: "center",
     alignItems: "center"
@@ -842,6 +854,28 @@ const styles = StyleSheet.create({
     fontWeight: "bold", // Change fontWeight to "bold" for a heavier font
     color: nutriTheme.COLORS.HEADER,
     margin: 10
+  },
+  dropdownContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginBottom: 10
+  },
+  dropdownLabel: {
+    marginRight: 10,
+    fontSize: 16,
+    color: "#000" // Set label text color to ensure visibility
+  },
+  dropdownPicker: {
+    flex: 1,
+    borderWidth: 1,
+    borderColor: "gray",
+    borderRadius: 15,
+    padding: 10,
+    backgroundColor: "#fff" // Set a background color for better visibility
+  },
+  pickerItem: {
+    fontSize: 16, // Adjust item font size for better visibility
+    color: "#000" // Set item text color to ensure visibility
   }
 });
 

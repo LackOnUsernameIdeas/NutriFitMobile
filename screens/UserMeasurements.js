@@ -258,15 +258,6 @@ class UserMeasurements extends React.Component {
                         </Text>
                         <Input
                           placeholder="Въведете ръст (см)"
-                          iconContent={
-                            <Icon
-                              size={16}
-                              color={nutriTheme.COLORS.ICON}
-                              name="ic_mail_24px"
-                              family="NutriExtra"
-                              style={styles.inputIcons}
-                            />
-                          }
                           style={styles.input}
                           keyboardType="numeric"
                           onChangeText={(height) =>
@@ -284,15 +275,6 @@ class UserMeasurements extends React.Component {
                         </Text>
                         <Input
                           placeholder="Въведете възраст"
-                          iconContent={
-                            <Icon
-                              size={16}
-                              color={nutriTheme.COLORS.ICON}
-                              name="ic_mail_24px"
-                              family="NutriExtra"
-                              style={styles.inputIcons}
-                            />
-                          }
                           style={styles.input}
                           keyboardType="numeric"
                           onChangeText={(age) =>
@@ -310,15 +292,6 @@ class UserMeasurements extends React.Component {
                         </Text>
                         <Input
                           placeholder="Въведете тегло (кг)"
-                          iconContent={
-                            <Icon
-                              size={16}
-                              color={nutriTheme.COLORS.ICON}
-                              name="ic_mail_24px"
-                              family="NutriExtra"
-                              style={styles.inputIcons}
-                            />
-                          }
                           style={styles.input}
                           keyboardType="numeric"
                           onChangeText={(weight) =>
@@ -336,15 +309,6 @@ class UserMeasurements extends React.Component {
                         </Text>
                         <Input
                           placeholder="Въведете обиколка на врат (см)"
-                          iconContent={
-                            <Icon
-                              size={16}
-                              color={nutriTheme.COLORS.ICON}
-                              name="ic_mail_24px"
-                              family="NutriExtra"
-                              style={styles.inputIcons}
-                            />
-                          }
                           keyboardType="numeric"
                           style={styles.input}
                           onChangeText={(neck) =>
@@ -362,15 +326,6 @@ class UserMeasurements extends React.Component {
                         </Text>
                         <Input
                           placeholder="Въведете обиколка на талия (см)"
-                          iconContent={
-                            <Icon
-                              size={16}
-                              color={nutriTheme.COLORS.ICON}
-                              name="ic_mail_24px"
-                              family="NutriExtra"
-                              style={styles.inputIcons}
-                            />
-                          }
                           style={styles.input}
                           keyboardType="numeric"
                           onChangeText={(waist) =>
@@ -388,15 +343,6 @@ class UserMeasurements extends React.Component {
                         </Text>
                         <Input
                           placeholder="Въведете обиколка на таз (см)"
-                          iconContent={
-                            <Icon
-                              size={16}
-                              color={nutriTheme.COLORS.ICON}
-                              name="ic_mail_24px"
-                              family="NutriExtra"
-                              style={styles.inputIcons}
-                            />
-                          }
                           style={styles.input}
                           keyboardType="numeric"
                           onChangeText={(hip) =>

@@ -9,7 +9,7 @@ class RecipeWidget extends React.Component {
     const { image, item, style, imageStyle } = this.props;
 
     if (!image) {
-      return null; // Handle case where image is missing
+      return null;
     }
 
     const imageStyles = [styles.fullImage, imageStyle];
@@ -28,9 +28,36 @@ class RecipeWidget extends React.Component {
           <Text size={15} style={styles.cardTitle} bold>
             {`Грамаж: ${item.totals.grams}г.`}
           </Text>
-          <Text size={12} color={nutriTheme.COLORS.ACTIVE} bold>
-            {`Калории: ${item.totals.calories} Протеин: ${item.totals.protein} Мазнини: ${item.totals.fat} Въглехидрати: ${item.totals.carbohydrates}`}
-          </Text>
+          <Block>
+            <Block
+              style={{
+                flexDirection: "row",
+                marginTop: 10,
+                gap: 33
+              }}
+            >
+              <Text size={12} color={nutriTheme.COLORS.ACTIVE} bold>
+                {`Калории: ${item.totals.calories} `}
+              </Text>
+              <Text size={12} color={nutriTheme.COLORS.ACTIVE} bold>
+                {`Протеин: ${item.totals.protein}г.`}
+              </Text>
+            </Block>
+            <Block
+              style={{
+                flexDirection: "row",
+                marginTop: 5,
+                gap: 30
+              }}
+            >
+              <Text size={12} color={nutriTheme.COLORS.ACTIVE} bold>
+                {`Мазнини: ${item.totals.fat}г. `}
+              </Text>
+              <Text size={12} color={nutriTheme.COLORS.ACTIVE} bold>
+                {`Въглехидрати: ${item.totals.carbohydrates}г.`}
+              </Text>
+            </Block>
+          </Block>
         </Block>
       </Block>
     );
@@ -76,6 +103,7 @@ const styles = StyleSheet.create({
     alignItems: "center"
   },
   cardTitle: {
+    textAlign: "center",
     flex: 1,
     flexWrap: "wrap",
     paddingBottom: 6

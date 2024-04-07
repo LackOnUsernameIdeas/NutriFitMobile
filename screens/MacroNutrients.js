@@ -124,20 +124,24 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     borderBottomColor: "black",
     paddingVertical: 10,
-    paddingHorizontal: 5
+    paddingHorizontal: 5,
+    borderColor: "transparent", // Add this line
+    borderWidth: 2
   },
   pressedRow: {
     opacity: 0.5
   },
   selectedRow: {
-    borderColor: "#9a99ff", // Set border color to your desired color
+    borderBottomWidth: 3,
+    borderBottomColor: "#9a99ff",
+    borderColor: "#9a99ff",
     backgroundColor: "#CFD2DB"
   },
   cell: {
     flex: 1
   },
   nameCell: {
-    flex: 2 // Adjust the flex value as needed to fit the name column
+    flex: 2
   },
   tooltip: {
     position: "absolute",

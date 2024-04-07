@@ -15,7 +15,7 @@ import DailyCalorieRequirements from "./DailyCalorieRequirements";
 import { Card } from "../components";
 import { nutriTheme } from "../constants";
 import MacroNutrients from "./MacroNutrients";
-import CustomDropdown from "../components/Dropdown";
+import CuisineDropdown from "../components/Dropdown";
 import { Ionicons } from "@expo/vector-icons";
 import {
   savePreferences,
@@ -29,7 +29,7 @@ class MealPlanner extends React.Component {
     this.state = {
       currentUser: null,
       userPreferences: {
-        Cuisine: "",
+        Cuisine: [],
         Diet: "",
         Calories: "",
         Protein: "",
@@ -285,6 +285,15 @@ class MealPlanner extends React.Component {
     }));
   };
 
+  handleSelectedCuisine = (selectedCuisines) => {
+    this.setState((prevState) => ({
+      userPreferences: {
+        ...prevState.userPreferences,
+        Cuisine: selectedCuisines // Update selected cuisines in state
+      }
+    }));
+  };
+
   render() {
     console.log("userPreferences: ", this.state.userPreferences);
 
@@ -332,7 +341,7 @@ class MealPlanner extends React.Component {
       if (this.state.userPreferences.Cuisine.length === 0) {
         cuisinePhrase = "всяка";
       } else if (this.state.userPreferences.Cuisine.length === 1) {
-        cuisinePhrase = this.state.userPreferences.Cuisine[0];
+        cuisinePhrase = translatedCuisine[0];
       } else {
         cuisinePhrase = "следните";
       }
@@ -883,7 +892,7 @@ class MealPlanner extends React.Component {
                   }
                   style={styles.input}
                 />
-                <CustomDropdown />
+                <CuisineDropdown onCuisineSelect={this.handleSelectedCuisine} />
               </View>
 
               {isLoading && (

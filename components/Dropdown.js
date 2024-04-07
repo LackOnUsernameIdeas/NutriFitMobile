@@ -11,20 +11,23 @@ class CuisineDropdown extends Component {
   }
 
   handleCuisineSelect = (cuisine) => {
-    const { selectedCuisines } = this.state;
-    if (selectedCuisines.includes(cuisine)) {
-      // If cuisine is already selected, remove it from the selectedCuisines array
-      const updatedCuisines = selectedCuisines.filter(
-        (selected) => selected !== cuisine
-      );
-      this.setState({ selectedCuisines: updatedCuisines });
-    } else {
-      // If cuisine is not selected, add it to the selectedCuisines array
-      this.setState((prevState) => ({
-        selectedCuisines: [...prevState.selectedCuisines, cuisine]
-      }));
-    }
-    // You can also perform additional actions when a cuisine is selected or deselected
+    this.setState((prevState) => {
+      const updatedCuisines = [...prevState.selectedCuisines];
+      const index = updatedCuisines.indexOf(cuisine);
+
+      if (index === -1) {
+        // If cuisine is not selected, add it to the selectedCuisines array
+        updatedCuisines.push(cuisine);
+      } else {
+        // If cuisine is already selected, remove it from the selectedCuisines array
+        updatedCuisines.splice(index, 1);
+      }
+
+      // Invoke onCuisineSelect callback with updated selected cuisines
+      this.props.onCuisineSelect(updatedCuisines);
+
+      return { selectedCuisines: updatedCuisines };
+    });
   };
 
   render() {

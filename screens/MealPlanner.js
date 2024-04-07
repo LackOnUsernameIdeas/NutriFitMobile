@@ -17,6 +17,11 @@ import { nutriTheme } from "../constants";
 import MacroNutrients from "./MacroNutrients";
 import CustomDropdown from "../components/Dropdown";
 import { Ionicons } from "@expo/vector-icons";
+import {
+  savePreferences,
+  saveMealPlan,
+  saveDeviations
+} from "../database/setFunctions";
 
 class MealPlanner extends React.Component {
   constructor(props) {
@@ -79,6 +84,35 @@ class MealPlanner extends React.Component {
     ) {
       // Ако условието е изпълнено, се извиква метод за зареждане на данни.
       this.fetchData();
+    }
+
+    if (prevState.userPreferences !== this.state.userPreferences) {
+      savePreferences(
+        this.state.currentUser.uid,
+        Number(this.state.userPreferences.Calories),
+        {
+          name: this.state.userPreferences.Diet,
+          protein: this.state.userPreferences.Protein,
+          fat: this.state.userPreferences.Fat,
+          carbs: this.state.userPreferences.Carbohydrates
+        }
+      );
+    }
+
+    if (
+      prevState.mealPlan !== this.state.mealPlan &&
+      prevState.mealPlanImages !== this.state.mealPlanImages
+    ) {
+      const aiUsed = this.state.isPlanGeneratedWithOpenAI
+        ? "mealPlanOpenAI"
+        : "mealPlanGemini";
+
+      saveMealPlan(
+        this.state.currentUser.uid,
+        aiUsed,
+        this.state.mealPlan,
+        this.state.mealPlanImages
+      );
     }
   }
 

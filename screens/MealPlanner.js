@@ -22,6 +22,7 @@ import {
   saveMealPlan,
   saveDeviations
 } from "../database/setFunctions";
+import Deviations from "./Deviations";
 
 class MealPlanner extends React.Component {
   constructor(props) {
@@ -784,7 +785,8 @@ class MealPlanner extends React.Component {
       dailyCaloryRequirements,
       macroNutrients,
       currentPage,
-      itemsPerPage
+      itemsPerPage,
+      isPlanGeneratedWithOpenAI
     } = this.state;
 
     const levels = [1, 2, 3, 4, 5, 6];
@@ -983,6 +985,13 @@ class MealPlanner extends React.Component {
                           return null;
                         }
                       })}
+                    {Object.keys(this.state.mealPlan).length !== 0 && (
+                      <Deviations
+                        mealPlan={this.state.mealPlan}
+                        userPreferences={userPreferences}
+                        isPlanGeneratedWithOpenAI={isPlanGeneratedWithOpenAI}
+                      />
+                    )}
                   </React.Fragment>
                 )}
               </React.Fragment>

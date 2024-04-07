@@ -35,6 +35,7 @@
     "expo-splash-screen": "^0.18.2",
     "firebase": "^10.9.0",
     "galio-framework": "^0.8.0",
+    "lodash": "^4.17.21",
     "prop-types": "^15.7.2",
     "react": "18.2.0",
     "react-native": "0.71.14",

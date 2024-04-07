@@ -56,34 +56,51 @@ class MealPlanner extends React.Component {
     };
   }
 
+  // Извиква се при първоначално зареждане на компонента.
   componentDidMount() {
+    // Извлича се аутентикационния обект.
     const auth = getAuth();
+    // Създава се проследимост към промените на аутентикационния статус на потребителя.
     this.unsubscribe = auth.onAuthStateChanged((user) => {
+      // Проверява дали има активен потребител.
       if (user) {
+        // Актуализира се състоянието с текущия потребител.
         this.setState({ currentUser: user });
       } else {
+        // В случай на липса на потребител, състоянието се актуализира до нулево.
         this.setState({ currentUser: null });
       }
     });
   }
 
+  // Извиква се след всяко обновяване на компонента.
   componentDidUpdate(prevProps, prevState) {
+    // Проверява дали предишното състояние на текущия потребител се различава от текущото и дали има активен потребител.
     if (
       prevState.currentUser !== this.state.currentUser &&
       this.state.currentUser
     ) {
+      // Ако условието е изпълнено, се извиква метод за зареждане на данни.
       this.fetchData();
     }
   }
 
+  // Извиква се преди изтриване на компонента.
   componentWillUnmount() {
+    // Прекъсва проследяването на промените в аутентикационния статус на потребителя.
     this.unsubscribe();
   }
 
+  /**
+   * Извлича данни от външен източник чрез асинхронна заявка и актуализира състоянието на компонента с получените данни.
+   */
   fetchData = async () => {
     try {
+      // Извличане на уникалния идентификационен номер на текущия потребител.
       const uid = this.state.currentUser.uid;
+      // Генериране на текущата дата във формат ISO и извличане на само датата.
       const date = new Date().toISOString().slice(0, 10);
+      // Изпращане на POST заявка към NutriFit API със зададени хедъри и body на заявката.
       const response = await fetch(
         "https://nutri-api.noit.eu/weightStatsAndMealPlanner",
         {
@@ -99,13 +116,16 @@ class MealPlanner extends React.Component {
         }
       );
 
+      // Проверка за успешен отговор от сървъра.
       if (!response.ok) {
+        // В случай на неуспешна заявка, генерира се грешка.
         throw new Error("Failed to fetch weight stats");
       }
 
+      // Извличане на данните от отговора в JSON формат.
       const weightStatsData = await response.json();
 
-      // Update state with fetched data
+      // Актуализиране на състоянието с получените данни.
       this.setState({
         userData: {
           gender: weightStatsData.userDataSaveable.gender,
@@ -133,10 +153,17 @@ class MealPlanner extends React.Component {
         isDailyCaloryLoading: false
       });
     } catch (error) {
+      // В случай на грешка при извличането на данни, извеждане на съобщение за грешка в конзолата.
       console.error("Error fetching weight stats:", error);
     }
   };
 
+  /**
+   * Изчислява препоръчителната цел за тегло на потребителя.
+   * @param {Object} differenceFromPerfectWeight - Обект, съдържащ разликата от идеалното тегло и информация дали потребителят е под или над нормата.
+   * @returns {string} - Препоръчителната цел за тегло, в килограми.
+   * @throws {Error} - Грешка при невъзможност за изчисляване на препоръчителната цел.
+   */
   calculateRecommendedGoal = (differenceFromPerfectWeight) => {
     const difference = differenceFromPerfectWeight.difference;
     const underOrAbove = differenceFromPerfectWeight.isUnderOrAbove;
@@ -154,6 +181,11 @@ class MealPlanner extends React.Component {
     return recommendedGoal + " (кг.)";
   };
 
+  /**
+   * Обработва входните данни от потребителя.
+   * @param {string} key - Ключът на входните данни.
+   * @param {string|number} value - Стойността на входните данни.
+   */
   handleInputChange = (key, value) => {
     if (
       key === "Calories" ||
@@ -179,11 +211,21 @@ class MealPlanner extends React.Component {
     }
   };
 
+  /**
+   * Обработва избора на цел от страна на потребителя.
+   * @param {string} goal - Избраната цел от потребителя.
+   */
   handleGoalSelect = (goal) => {
+    // Актуализира се състоянието с избраната цел.
     this.setState({ selectedGoal: goal });
   };
 
+  /**
+   * Обработва избора на калории от потребителя.
+   * @param {number} calories - Избраните калории от потребителя.
+   */
   handleSelectedCalories = (calories) => {
+    // Актуализира се състоянието с избраните калории.
     this.setState((prevState) => ({
       userPreferences: {
         ...prevState.userPreferences,
@@ -192,7 +234,15 @@ class MealPlanner extends React.Component {
     }));
   };
 
+  /**
+   * Обработва избора на диета от страна на потребителя.
+   * @param {number} protein - Избраното количество протеини от потребителя.
+   * @param {number} fat - Избраното количество мазнини от потребителя.
+   * @param {number} carbs - Избраното количество въглехидрати от потребителя.
+   * @param {string} dietName - Името на избраната диета от потребителя.
+   */
   handleSelectedDiet = (protein, fat, carbs, dietName) => {
+    // Актуализира се състоянието с избраната диета.
     this.setState((prevState) => ({
       userPreferences: {
         ...prevState.userPreferences,
@@ -207,6 +257,7 @@ class MealPlanner extends React.Component {
   render() {
     console.log("userPreferences: ", this.state.userPreferences);
 
+    // Обект, който съдържа преводите на кухните от английски на български.
     const cuisineTranslation = {
       Italian: "Италианска",
       Bulgarian: "Българска",
@@ -214,6 +265,11 @@ class MealPlanner extends React.Component {
       French: "Френска"
     };
 
+    /**
+     * Превежда кухнята от английски на български.
+     * @param {string|string[]} englishCuisine - Кухнята или кухните, които трябва да бъдат преведени.
+     * @returns {string|string[]} - Преведената кухня или кухните.
+     */
     translateCuisine = (englishCuisine) => {
       if (Array.isArray(englishCuisine)) {
         return englishCuisine.map(
@@ -224,12 +280,14 @@ class MealPlanner extends React.Component {
       }
     };
 
+    // Превеждане на предпочитаната кухня на потребителя и извеждане на преведената информация в конзолата.
     const translatedCuisine = translateCuisine(
       this.state.userPreferences.Cuisine
     );
 
     let promptCuisine;
 
+    // Генериране на фразата за предпочитаната кухня на потребителя.
     if (Array.isArray(translatedCuisine)) {
       promptCuisine = translatedCuisine.join(", ");
     } else {
@@ -238,6 +296,7 @@ class MealPlanner extends React.Component {
     console.log("TRANSLATED --->", promptCuisine);
     let cuisinePhrase;
 
+    // Генериране на фразата за предпочитаната кухня на потребителя.
     if (Array.isArray(this.state.userPreferences.Cuisine)) {
       if (this.state.userPreferences.Cuisine.length === 0) {
         cuisinePhrase = "всяка";
@@ -250,6 +309,8 @@ class MealPlanner extends React.Component {
       cuisinePhrase = this.state.userPreferences.Cuisine;
     }
     console.log("cuisinePhrase --->", cuisinePhrase);
+
+    // промпт за OpenAI и Gemini.
     const prompt = `Вие сте опитен диетолог, който наблюдава пациентите да консумират само ядлива и традиционна храна от
       ${cuisinePhrase} кухня/кухни (${promptCuisine}). Фокусирайте се върху създаването на ТОЧЕН, разнообразен и вкусен дневен хранителен план, съставен от следните ограничения: калории (${
       this.state.userPreferences.Calories
@@ -301,6 +362,11 @@ class MealPlanner extends React.Component {
             'dessert':{'name':'string','totals':{'calories':number,'protein':number,'fat':number,'carbohydrates':number,'grams':number}, 'ingredients':['quantity ingredient','quantity ingredient','quantity ingredient','quantity ingredient','quantity ingredient'...], 'instructions':['1.string','2.string','3.string','4.string'...], 'recipeQuantity': number (in grams)}
           }`;
 
+    /**
+     * Проверява общите стойности в даден обект или масив от обекти.
+     * @param {Object|Object[]} obj - Обект или масив от обекти, които трябва да бъдат проверени.
+     * @throws {Error} - Генерира се грешка, ако стойностите в обекта не са числа.
+     */
     checkTotals = (obj) => {
       if (Array.isArray(obj)) {
         obj.forEach((item) => checkTotals(item));
@@ -314,15 +380,19 @@ class MealPlanner extends React.Component {
             }
           }
         }
-        // Recursively check the nested objects
+        // Рекурсивно проверява вложените обекти
         for (let key in obj) {
           checkTotals(obj[key]);
         }
       }
     };
 
+    /**
+     * Генерира план за хранене с помощта на OpenAI модел.
+     */
     generatePlanWithOpenAI = async () => {
       try {
+        // Актуализира състоянието, за да покаже, че планът се генерира с OpenAI модела и че заявката е в процес на обработка.
         this.setState({
           isPlanGeneratedWithOpenAI: true,
           isPlanGeneratedWithBgGPT: false,
@@ -330,6 +400,7 @@ class MealPlanner extends React.Component {
           isLoading: true
         });
         console.log("fetching openai");
+        // Изпраща заявка към OpenAI API за генериране на план за хранене.
         const response = await fetch(
           "https://api.openai.com/v1/chat/completions",
           {
@@ -351,6 +422,7 @@ class MealPlanner extends React.Component {
         );
 
         if (!response.ok) {
+          // Актуализира състоянието в случай на грешка при заявката към OpenAI API.
           this.setState({
             requestFailed: true
           });
@@ -359,6 +431,7 @@ class MealPlanner extends React.Component {
         console.log("res: ", response);
         const responseData = await response.json();
 
+        // Декодира и обработва отговора от OpenAI API.
         const unescapedData = responseData.choices[0].message.content;
         const escapedData = decodeURIComponent(unescapedData);
         console.log("escapedData: ", escapedData);
@@ -367,10 +440,12 @@ class MealPlanner extends React.Component {
 
         console.log("OPENAI: ", data);
 
+        // Филтрира обекта с данни за плана за хранене, като премахва стойностите за общи стойности (totals).
         const filteredArr = Object.fromEntries(
           Object.entries(data).filter(([key]) => key !== "totals")
         );
 
+        // Обект, който ще съдържа връзките към изображенията на ястията от плана за хранене.
         const mealPlanImagesData = {
           breakfast: {
             main: ""
@@ -386,12 +461,13 @@ class MealPlanner extends React.Component {
           }
         };
 
-        // Iterate over each meal and make a separate image generation request
+        // Обхождане на всяко ястие от плана и извършване на отделна заявка за генериране на изображение.
         for (const mealKey of Object.keys(filteredArr)) {
           const mealAppetizer = filteredArr[mealKey].appetizer;
           const mealMain = filteredArr[mealKey].main;
           const mealDessert = filteredArr[mealKey].dessert;
 
+          // Функция за извличане на изображение от името на ястието.
           async function fetchImage(name) {
             try {
               let response = await fetch(
@@ -415,16 +491,16 @@ class MealPlanner extends React.Component {
             }
           }
 
+          // Извличане на изображенията за апетитите, основните ястия и десертите.
           const imageAppetizer =
             mealKey === "lunch" ? await fetchImage(mealAppetizer.name) : null;
-
           const imageMain = await fetchImage(mealMain.name);
-
           const imageDessert =
             mealKey === "lunch" || mealKey === "dinner"
               ? await fetchImage(mealDessert.name)
               : null;
 
+          // Обработка на отговорите за изображенията и актуализиране на състоянието с връзките към изображенията на ястията.
           const imageAppetizerResponseData =
             imageAppetizer !== null ? await imageAppetizer.json() : null;
           const imageMainResponseData = await imageMain.json();
@@ -455,12 +531,14 @@ class MealPlanner extends React.Component {
 
         console.log("mealPlanImagesData:", mealPlanImagesData);
 
+        // Актуализира състоянието с връзките към изображенията на ястията и плана за хранене, които са били генерирани с OpenAI модела.
         this.setState({
           mealPlanImages: mealPlanImagesData,
           mealPlan: data,
           isLoading: false
         });
       } catch (error) {
+        // Актуализира състоянието в случай на грешка при генериране на плана за хранене.
         this.setState({
           requestFailed: true,
           isLoading: false
@@ -469,8 +547,12 @@ class MealPlanner extends React.Component {
       }
     };
 
+    /**
+     * Генерира план за хранене с помощта на Gemini модел.
+     */
     generatePlanWithGemini = async () => {
       try {
+        // Актуализира състоянието, за да покаже, че планът се генерира с Gemini модела и че заявката е в процес на обработка.
         this.setState({
           isPlanGeneratedWithOpenAI: false,
           isPlanGeneratedWithGemini: true,
@@ -479,6 +561,7 @@ class MealPlanner extends React.Component {
         });
         console.log("PROMPT --->", prompt);
         console.log("fetching gemini");
+        // Изпраща заявка към NutriFit API за генериране на план за хранене с Gemini модела.
         const response = await fetch(
           "https://nutri-api.noit.eu/geminiGenerateResponse",
           {
@@ -495,6 +578,7 @@ class MealPlanner extends React.Component {
 
         console.log("Response from backend:", responseData.aiResponse);
 
+        // Преобразува отговора от бекенда в JSON формат и проверява за валидност.
         const stringToRepair = responseData.aiResponse
           .replace(/^```json([\s\S]*?)```$/, "$1")
           .replace(/^```JSON([\s\S]*?)```$/, "$1")
@@ -511,6 +595,7 @@ class MealPlanner extends React.Component {
 
         console.log("jsonObject: ", jsonObject);
 
+        // Обект, който ще съдържа връзките към изображенията на ястията от плана за хранене, генериран с Gemini модела.
         const mealPlanImagesData = {
           breakfast: {
             main: ""
@@ -525,20 +610,15 @@ class MealPlanner extends React.Component {
             dessert: ""
           }
         };
-        const updatedMealPlanImagesData = {};
-        const updatedMealPlan = {};
+
+        // Обхождане на всяко ястие от плана и извършване на отделна заявка за генериране на изображение.
         for (const mealKey of Object.keys(jsonObject)) {
           if (mealKey !== "totals") {
             const mealAppetizer = jsonObject[mealKey].appetizer;
             const mealMain = jsonObject[mealKey].main;
             const mealDessert = jsonObject[mealKey].dessert;
 
-            // console.log("meal: ", meal);
-            // console.log("meal name: ", meal.name);
-
-            //NutriFit: cx=10030740e88c842af, key=AIzaSyDqUez1TEmLSgZAvIaMkWfsq9rSm0kDjIw
-            //NutriFit2: cx=258e213112b4b4492, key=AIzaSyArE48NFh1befjjDxpSrJ0eBgQh_OmQ7RA
-            //NutriFit3: cx=527000b0fabcc4dab, key=AIzaSyDwqaIBGxmhEc6GVR3lwOVk_-0EpwKvOPA
+            // Функция за извличане на изображение от името на ястието.
             async function fetchImage(name) {
               try {
                 let response = await fetch(
@@ -562,27 +642,24 @@ class MealPlanner extends React.Component {
               }
             }
 
+            // Извличане на изображенията за апетитите, основните ястия и десертите.
             const imageAppetizer =
               mealKey === "lunch" ? await fetchImage(mealAppetizer.name) : null;
-
             const imageMain = await fetchImage(mealMain.name);
-
             const imageDessert =
               mealKey === "lunch" || mealKey === "dinner"
                 ? await fetchImage(mealDessert.name)
                 : null;
 
+            // Обработка на отговорите за изображенията и актуализиране на състоянието с връзките към изображенията на ястията.
             const imageAppetizerResponseData =
               imageAppetizer !== null ? await imageAppetizer.json() : null;
             const imageMainResponseData = await imageMain.json();
             const imageDessertResponseData =
               imageDessert !== null ? await imageDessert.json() : null;
 
-            console.log("imageDessert: ", imageDessert, mealKey);
-            // console.log(
-            //   `Image Generation Response for ${mealAppetizer.name}: `,
-            //   imageAppetizerResponseData.items[0].link
-            // );
+            // console.log("imageDessert: ", imageDessert, mealKey);
+
             if (
               imageAppetizerResponseData !== null &&
               imageAppetizerResponseData?.items?.[0]?.link
@@ -603,27 +680,17 @@ class MealPlanner extends React.Component {
               mealPlanImagesData[mealKey].dessert =
                 imageDessertResponseData.items[0].link;
             }
-
-            updatedMealPlanImagesData[mealKey] = {
-              appetizer: imageAppetizerResponseData?.items?.[0]?.link || "",
-              main: imageMainResponseData.items[0].link,
-              dessert: imageDessertResponseData?.items?.[0]?.link || ""
-            };
-
-            updatedMealPlan[mealKey] = {
-              appetizer: jsonObject[mealKey].appetizer,
-              main: jsonObject[mealKey].main,
-              dessert: jsonObject[mealKey].dessert
-            };
           }
         }
 
+        // Актуализира състоянието с връзките към изображенията на ястията и плана за хранене, които са били генерирани с Gemini модела.
         this.setState({
-          mealPlanImages: updatedMealPlanImagesData,
-          mealPlan: updatedMealPlan,
+          mealPlanImages: mealPlanImagesData,
+          mealPlan: jsonObject,
           isLoading: false
         });
       } catch (error) {
+        // Актуализира състоянието в случай на грешка при генериране на плана за хранене.
         this.setState({
           requestFailed: true,
           isLoading: false
@@ -632,18 +699,29 @@ class MealPlanner extends React.Component {
       }
     };
 
+    /**
+     * Отива към предходната страница в навигацията.
+     */
     goToPreviousPage = () => {
       this.setState((prevState) => ({
         currentPage: prevState.currentPage - 1
       }));
     };
 
+    /**
+     * Отива към следващата страница в навигацията.
+     */
     goToNextPage = () => {
       this.setState((prevState) => ({
         currentPage: prevState.currentPage + 1
       }));
     };
 
+    /**
+     * Превежда типа на ястието от английски на български.
+     * @param {string} mealType - Типа на ястието на английски.
+     * @returns {string} - Преведеният тип на ястието на български.
+     */
     translateMealType = (mealType) => {
       switch (mealType) {
         case "breakfast":
@@ -653,7 +731,7 @@ class MealPlanner extends React.Component {
         case "dinner":
           return "Вечеря";
         default:
-          return mealType; // Return the original meal type if translation is not available
+          return mealType; // Връща оригиналния тип на ястието, ако преводът не е наличен
       }
     };
 
@@ -806,11 +884,10 @@ class MealPlanner extends React.Component {
           )}
           {Object.keys(this.state.mealPlan).map((mealType, index) => {
             const meal = this.state.mealPlan[mealType];
-            const mealImages = this.state.mealPlanImages[mealType]; // Get all images for the meal type
+            const mealImages = this.state.mealPlanImages[mealType];
 
             return (
               <React.Fragment key={index}>
-                {/* Check if the current meal type is within the current page */}
                 {index === currentPage && (
                   <React.Fragment>
                     {Object.keys(this.state.mealPlan).length !== 0 && (
@@ -843,15 +920,13 @@ class MealPlanner extends React.Component {
                         </View>
                       </React.Fragment>
                     )}
-                    {/* Map through each item in the meal type */}
                     {meal &&
                       Object.keys(meal).map((itemType) => {
-                        const item = meal[itemType]; // Get the item details
+                        const item = meal[itemType];
                         const mealImage = mealImages
                           ? mealImages[itemType]
-                          : null; // Get the image for the item
+                          : null;
 
-                        // Check if item exists before rendering RecipeWidget
                         if (item) {
                           return (
                             <Block
@@ -862,7 +937,6 @@ class MealPlanner extends React.Component {
                             </Block>
                           );
                         } else {
-                          // Handle case where item is undefined
                           return null;
                         }
                       })}

@@ -1,15 +1,12 @@
-import React, { useState, useEffect } from "react";
+import React from "react";
 import {
   StyleSheet,
-  Dimensions,
   ScrollView,
   TouchableOpacity,
   View,
   TextInput,
-  ActivityIndicator,
-  Button
+  ActivityIndicator
 } from "react-native";
-import { Picker } from "@react-native-picker/picker";
 import { Block, Text } from "galio-framework";
 import { EXPO_PUBLIC_OPENAI_API_KEY } from "@env";
 import RecipeWidget from "../components/RecipeWidget";

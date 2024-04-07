@@ -816,19 +816,23 @@ class MealPlanner extends React.Component {
                   <ActivityIndicator size="large" color="#0000ff" />
                 </View>
               ) : (
-                <DailyCalorieRequirements
-                  dailyCaloryRequirementsArray={dailyCaloryRequirements}
-                  activityLevel={activityLevel}
-                  onGoalSelect={this.handleGoalSelect}
-                  onCaloriesSelect={this.handleSelectedCalories}
-                />
+                <Block>
+                  <DailyCalorieRequirements
+                    dailyCaloryRequirementsArray={dailyCaloryRequirements}
+                    activityLevel={activityLevel}
+                    onGoalSelect={this.handleGoalSelect}
+                    onCaloriesSelect={this.handleSelectedCalories}
+                  />
+                  {this.state.selectedGoal !== "" && (
+                    <MacroNutrients
+                      macroNutrientsArray={macroNutrients}
+                      activityLevel={activityLevel}
+                      selectedGoal={this.state.selectedGoal}
+                      onDietSelect={this.handleSelectedDiet}
+                    />
+                  )}
+                </Block>
               )}
-              <MacroNutrients
-                macroNutrientsArray={macroNutrients}
-                activityLevel={activityLevel}
-                selectedGoal={this.state.selectedGoal}
-                onDietSelect={this.handleSelectedDiet}
-              />
             </Card>
           )}
           {userPreferences.Diet && (
@@ -889,8 +893,7 @@ class MealPlanner extends React.Component {
               )}
               {requestFailed && (
                 <Text style={styles.title} size={20}>
-                  Не намерихме подходящ хранителен план за вас :( Опитайте
-                  отново.
+                  Не намерихме подходящ хранителен план за вас. Опитайте отново.
                 </Text>
               )}
               <View style={[styles.buttonContainer, { gap: 10 }]}>

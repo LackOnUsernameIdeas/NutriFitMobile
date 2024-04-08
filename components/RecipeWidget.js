@@ -2,14 +2,14 @@ import React from "react";
 import { Image, StyleSheet } from "react-native";
 import { Block, Text, theme } from "galio-framework";
 import PropTypes from "prop-types";
-import { argonTheme } from "../constants";
+import { nutriTheme } from "../constants";
 
 class RecipeWidget extends React.Component {
   render() {
     const { image, item, style, imageStyle } = this.props;
 
     if (!image) {
-      return null; // Handle case where image is missing
+      return null;
     }
 
     const imageStyles = [styles.fullImage, imageStyle];
@@ -26,11 +26,38 @@ class RecipeWidget extends React.Component {
             {item.name}
           </Text>
           <Text size={15} style={styles.cardTitle} bold>
-            {`Grams: ${item.totals.grams}`}
+            {`Грамаж: ${item.totals.grams}г.`}
           </Text>
-          <Text size={12} color={argonTheme.COLORS.ACTIVE} bold>
-            {`Calories: ${item.totals.calories}, Protein: ${item.totals.protein}, Fat: ${item.totals.fat}, Carbs: ${item.totals.carbohydrates}`}
-          </Text>
+          <Block>
+            <Block
+              style={{
+                flexDirection: "row",
+                marginTop: 10,
+                gap: 33
+              }}
+            >
+              <Text size={12} color={nutriTheme.COLORS.ACTIVE} bold>
+                {`Калории: ${item.totals.calories} `}
+              </Text>
+              <Text size={12} color={nutriTheme.COLORS.ACTIVE} bold>
+                {`Протеин: ${item.totals.protein}г.`}
+              </Text>
+            </Block>
+            <Block
+              style={{
+                flexDirection: "row",
+                marginTop: 5,
+                gap: 30
+              }}
+            >
+              <Text size={12} color={nutriTheme.COLORS.ACTIVE} bold>
+                {`Мазнини: ${item.totals.fat}г. `}
+              </Text>
+              <Text size={12} color={nutriTheme.COLORS.ACTIVE} bold>
+                {`Въглехидрати: ${item.totals.carbohydrates}г.`}
+              </Text>
+            </Block>
+          </Block>
         </Block>
       </Block>
     );
@@ -47,11 +74,10 @@ RecipeWidget.propTypes = {
 const styles = StyleSheet.create({
   card: {
     backgroundColor: theme.COLORS.WHITE,
-    marginVertical: theme.SIZES.BASE,
     borderWidth: 0,
     borderRadius: 15,
     minHeight: 114,
-    marginBottom: 16
+    marginTop: 5
   },
   imageContainer: {
     borderRadius: 15,
@@ -62,7 +88,7 @@ const styles = StyleSheet.create({
     height: 150
   },
   shadow: {
-    shadowColor: argonTheme.COLORS.BLACK,
+    shadowColor: nutriTheme.COLORS.BLACK,
     shadowOffset: {
       width: 0,
       height: 2
@@ -77,6 +103,7 @@ const styles = StyleSheet.create({
     alignItems: "center"
   },
   cardTitle: {
+    textAlign: "center",
     flex: 1,
     flexWrap: "wrap",
     paddingBottom: 6

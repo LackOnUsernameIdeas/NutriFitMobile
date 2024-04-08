@@ -4,35 +4,21 @@ import {
   TouchableOpacity,
   StyleSheet,
   Platform,
-  Dimensions
+  Dimensions,
+  Image
 } from "react-native";
 import { Button, Block, NavBar, Text, theme } from "galio-framework";
 import { getAuth, signOut } from "firebase/auth";
-
+import Images from "../constants/Images";
 import Icon from "./Icon";
 import Input from "./Input";
 import Tabs from "./Tabs";
-import argonTheme from "../constants/Theme";
+import nutriTheme from "../constants/Theme";
 
 const { height, width } = Dimensions.get("window");
 const iPhoneX = () =>
   Platform.OS === "ios" &&
   (height === 812 || width === 812 || height === 896 || width === 896);
-
-const BellButton = ({ isWhite, style, navigation }) => (
-  <TouchableOpacity
-    style={[styles.button, style]}
-    onPress={() => navigation.navigate("Pro")}
-  >
-    <Icon
-      family="ArgonExtra"
-      size={16}
-      name="bell"
-      color={argonTheme.COLORS[isWhite ? "WHITE" : "ICON"]}
-    />
-    <Block middle style={styles.notify} />
-  </TouchableOpacity>
-);
 
 const LogOutButton = ({ isWhite, style, navigation }) => {
   const handleLogOut = async () => {
@@ -46,25 +32,11 @@ const LogOutButton = ({ isWhite, style, navigation }) => {
         family="Entypo"
         size={16}
         name="log-out"
-        color={argonTheme.COLORS[isWhite ? "WHITE" : "ICON"]}
+        color={nutriTheme.COLORS[isWhite ? "WHITE" : "ICON"]}
       />
     </TouchableOpacity>
   );
 };
-
-const SearchButton = ({ isWhite, style, navigation }) => (
-  <TouchableOpacity
-    style={[styles.button, style]}
-    onPress={() => navigation.navigate("Pro")}
-  >
-    <Icon
-      size={16}
-      family="Galio"
-      name="search-zoom-in"
-      color={theme.COLORS[isWhite ? "WHITE" : "ICON"]}
-    />
-  </TouchableOpacity>
-);
 
 class Header extends React.Component {
   handleLeftPress = () => {
@@ -74,110 +46,11 @@ class Header extends React.Component {
   renderRight = () => {
     const { white, title, navigation } = this.props;
 
-    if (title === "Title") {
-      return [
-        <BellButton key="chat-title" navigation={navigation} isWhite={white} />,
-        <LogOutButton
-          key="basket-title"
-          navigation={navigation}
-          isWhite={white}
-        />
-      ];
-    }
-
     switch (title) {
-      case "Home":
+      case "MealPlanner":
         return [
-          <BellButton
-            key="chat-home"
-            navigation={navigation}
-            isWhite={white}
-          />,
           <LogOutButton
             key="basket-home"
-            navigation={navigation}
-            isWhite={white}
-          />
-        ];
-      case "Deals":
-        return [
-          <BellButton key="chat-categories" navigation={navigation} />,
-          <LogOutButton key="basket-categories" navigation={navigation} />
-        ];
-      case "Categories":
-        return [
-          <BellButton
-            key="chat-categories"
-            navigation={navigation}
-            isWhite={white}
-          />,
-          <LogOutButton
-            key="basket-categories"
-            navigation={navigation}
-            isWhite={white}
-          />
-        ];
-      case "Category":
-        return [
-          <BellButton
-            key="chat-deals"
-            navigation={navigation}
-            isWhite={white}
-          />,
-          <LogOutButton
-            key="basket-deals"
-            navigation={navigation}
-            isWhite={white}
-          />
-        ];
-      case "Profile":
-        return [
-          <BellButton
-            key="chat-profile"
-            navigation={navigation}
-            isWhite={white}
-          />,
-          <LogOutButton
-            key="basket-deals"
-            navigation={navigation}
-            isWhite={white}
-          />
-        ];
-      case "Product":
-        return [
-          <SearchButton
-            key="search-product"
-            navigation={navigation}
-            isWhite={white}
-          />,
-          <LogOutButton
-            key="basket-product"
-            navigation={navigation}
-            isWhite={white}
-          />
-        ];
-      case "Search":
-        return [
-          <BellButton
-            key="chat-search"
-            navigation={navigation}
-            isWhite={white}
-          />,
-          <LogOutButton
-            key="basket-search"
-            navigation={navigation}
-            isWhite={white}
-          />
-        ];
-      case "Settings":
-        return [
-          <BellButton
-            key="chat-search"
-            navigation={navigation}
-            isWhite={white}
-          />,
-          <LogOutButton
-            key="basket-search"
             navigation={navigation}
             isWhite={white}
           />
@@ -185,70 +58,6 @@ class Header extends React.Component {
       default:
         break;
     }
-  };
-  renderSearch = () => {
-    const { navigation } = this.props;
-    return (
-      <Input
-        right
-        color="black"
-        style={styles.search}
-        placeholder="What are you looking for?"
-        placeholderTextColor={"#8898AA"}
-        onFocus={() => navigation.navigate("Pro")}
-        iconContent={
-          <Icon
-            size={16}
-            color={theme.COLORS.MUTED}
-            name="search-zoom-in"
-            family="ArgonExtra"
-          />
-        }
-      />
-    );
-  };
-  renderOptions = () => {
-    const { navigation, optionLeft, optionRight } = this.props;
-
-    return (
-      <Block row style={styles.options}>
-        <Button
-          shadowless
-          style={[styles.tab, styles.divider]}
-          onPress={() => navigation.navigate("Pro")}
-        >
-          <Block row middle>
-            <Icon
-              name="diamond"
-              family="ArgonExtra"
-              style={{ paddingRight: 8 }}
-              color={argonTheme.COLORS.ICON}
-            />
-            <Text size={16} style={styles.tabTitle}>
-              {optionLeft || "Beauty"}
-            </Text>
-          </Block>
-        </Button>
-        <Button
-          shadowless
-          style={styles.tab}
-          onPress={() => navigation.navigate("Pro")}
-        >
-          <Block row middle>
-            <Icon
-              size={16}
-              name="bag-17"
-              family="ArgonExtra"
-              style={{ paddingRight: 8 }}
-              color={argonTheme.COLORS.ICON}
-            />
-            <Text size={16} style={styles.tabTitle}>
-              {optionRight || "Fashion"}
-            </Text>
-          </Block>
-        </Button>
-      </Block>
-    );
   };
   renderTabs = () => {
     const { tabs, tabIndex, navigation } = this.props;
@@ -267,13 +76,7 @@ class Header extends React.Component {
   renderHeader = () => {
     const { search, options, tabs } = this.props;
     if (search || tabs || options) {
-      return (
-        <Block center>
-          {search ? this.renderSearch() : null}
-          {options ? this.renderOptions() : null}
-          {tabs ? this.renderTabs() : null}
-        </Block>
-      );
+      return <Block center>{tabs ? this.renderTabs() : null} </Block>;
     }
   };
   render() {
@@ -289,15 +92,8 @@ class Header extends React.Component {
       ...props
     } = this.props;
 
-    const noShadow = [
-      "Search",
-      "Categories",
-      "Deals",
-      "Pro",
-      "Profile"
-    ].includes(title);
     const headerStyles = [
-      !noShadow ? styles.shadow : null,
+      styles.shadow,
       transparent ? { backgroundColor: "rgba(0,0,0,0)" } : null
     ];
 
@@ -310,33 +106,25 @@ class Header extends React.Component {
       <Block style={headerStyles}>
         <NavBar
           back={false}
-          title={title}
           style={navbarStyles}
           transparent={transparent}
           right={this.renderRight()}
-          rightStyle={{ alignItems: "center" }}
-          left={
-            <Icon
-              name={back ? "chevron-left" : "menu"}
-              family="entypo"
-              size={20}
-              onPress={this.handleLeftPress}
-              color={
-                iconColor ||
-                (white ? argonTheme.COLORS.WHITE : argonTheme.COLORS.ICON)
-              }
-              style={{ marginTop: 2 }}
-            />
-          }
-          leftStyle={{ paddingVertical: 12, flex: 0.2 }}
+          rightStyle={{
+            alignItems: "center",
+            marginTop: 60,
+            marginLeft: 270
+          }}
+          leftStyle={{ paddingVertical: 12 }}
           titleStyle={[
             styles.title,
-            { color: argonTheme.COLORS[white ? "WHITE" : "HEADER"] },
+            { color: nutriTheme.COLORS[white ? "WHITE" : "HEADER"] },
             titleColor && { color: titleColor }
           ]}
           {...props}
         />
-        {this.renderHeader()}
+        <Block flex={0.06} style={styles.logoHeader}>
+          <Image styles={styles.logo} source={Images.Logo} />
+        </Block>
       </Block>
     );
   }
@@ -347,6 +135,12 @@ const styles = StyleSheet.create({
     padding: 12,
     position: "relative"
   },
+  logoHeader: {
+    paddingHorizontal: 18,
+    paddingBottom: theme.SIZES.BASE * 2,
+    justifyContent: "center",
+    zIndex: 9999999
+  },
   title: {
     width: "100%",
     fontSize: 16,
@@ -355,7 +149,7 @@ const styles = StyleSheet.create({
   navbar: {
     paddingVertical: 0,
     paddingBottom: theme.SIZES.BASE * 1.5,
-    paddingTop: iPhoneX ? theme.SIZES.BASE * 4 : theme.SIZES.BASE,
+    paddingTop: iPhoneX ? theme.SIZES.BASE * 2 : theme.SIZES.BASE,
     zIndex: 5
   },
   shadow: {
@@ -367,7 +161,7 @@ const styles = StyleSheet.create({
     elevation: 3
   },
   notify: {
-    backgroundColor: argonTheme.COLORS.LABEL,
+    backgroundColor: nutriTheme.COLORS.LABEL,
     borderRadius: 4,
     height: theme.SIZES.BASE / 2,
     width: theme.SIZES.BASE / 2,
@@ -388,7 +182,7 @@ const styles = StyleSheet.create({
     marginHorizontal: 16,
     borderWidth: 1,
     borderRadius: 3,
-    borderColor: argonTheme.COLORS.BORDER
+    borderColor: nutriTheme.COLORS.BORDER
   },
   options: {
     marginBottom: 24,
@@ -406,7 +200,7 @@ const styles = StyleSheet.create({
   tabTitle: {
     lineHeight: 19,
     fontWeight: "400",
-    color: argonTheme.COLORS.HEADER
+    color: nutriTheme.COLORS.HEADER
   }
 });
 

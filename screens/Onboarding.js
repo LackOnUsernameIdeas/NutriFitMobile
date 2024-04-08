@@ -10,7 +10,7 @@ import { Block, Button, Text, theme } from "galio-framework";
 
 const { height, width } = Dimensions.get("screen");
 
-import argonTheme from "../constants/Theme";
+import nutriTheme from "../constants/Theme";
 import Images from "../constants/Images";
 
 class Onboarding extends React.Component {
@@ -34,22 +34,22 @@ class Onboarding extends React.Component {
             <Block style={styles.title}>
               <Block>
                 <Text color="white" size={60}>
-                  Добре дошли в NutriFit
+                  Добре дошли!
                 </Text>
               </Block>
+            </Block>
+            <Block center>
               <Block style={styles.subTitle}>
                 <Text color="white" size={16}>
                   Бъдете винаги във форма и в оптимално здравословно състояние с
                   помощта на изкуствен интелект!
                 </Text>
               </Block>
-            </Block>
-            <Block center>
               <Button
                 style={styles.button}
-                color={argonTheme.COLORS.SECONDARY}
+                color={nutriTheme.COLORS.SECONDARY}
                 onPress={() => navigation.navigate("LogIn")}
-                textStyle={{ color: argonTheme.COLORS.BLACK }}
+                textStyle={{ color: nutriTheme.COLORS.BLACK }}
               >
                 Влезте в профила Ви
               </Button>
@@ -85,7 +85,8 @@ const styles = StyleSheet.create({
     width: width - theme.SIZES.BASE * 4,
     height: theme.SIZES.BASE * 3,
     shadowRadius: 0,
-    shadowOpacity: 0
+    shadowOpacity: 0,
+    borderRadius: 10
   },
   logo: {
     width: 200,
@@ -95,10 +96,10 @@ const styles = StyleSheet.create({
     marginTop: "-50%"
   },
   title: {
-    marginTop: "-25%"
+    marginTop: "-15%"
   },
   subTitle: {
-    marginTop: 20
+    marginBottom: 10
   }
 });
 

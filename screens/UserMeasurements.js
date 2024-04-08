@@ -8,9 +8,9 @@ import {
   TouchableOpacity,
   ActivityIndicator
 } from "react-native";
-import { Block, Checkbox, Text, theme } from "galio-framework";
+import { Block, Text } from "galio-framework";
 import { Button, Icon, Input } from "../components";
-import { Images, argonTheme } from "../constants";
+import { Images, nutriTheme } from "../constants";
 import { fetchAdditionalUserData } from "../database/getFunctions";
 import { getAuth, signOut } from "firebase/auth";
 
@@ -226,7 +226,7 @@ class UserMeasurements extends React.Component {
             name="arrow-back"
             family="Ionicons"
             size={30}
-            color={argonTheme.COLORS.WHITE}
+            color={nutriTheme.COLORS.WHITE}
           />
         </TouchableOpacity>
         <ImageBackground
@@ -250,7 +250,7 @@ class UserMeasurements extends React.Component {
                     <Block flex center>
                       <Block width={width * 0.8}>
                         <Text
-                          color={argonTheme.COLORS.MUTED}
+                          color={nutriTheme.COLORS.MUTED}
                           size={14}
                           style={styles.inputLabel}
                         >
@@ -258,15 +258,6 @@ class UserMeasurements extends React.Component {
                         </Text>
                         <Input
                           placeholder="Въведете ръст (см)"
-                          iconContent={
-                            <Icon
-                              size={16}
-                              color={argonTheme.COLORS.ICON}
-                              name="ic_mail_24px"
-                              family="ArgonExtra"
-                              style={styles.inputIcons}
-                            />
-                          }
                           style={styles.input}
                           keyboardType="numeric"
                           onChangeText={(height) =>
@@ -276,7 +267,7 @@ class UserMeasurements extends React.Component {
                       </Block>
                       <Block width={width * 0.8}>
                         <Text
-                          color={argonTheme.COLORS.MUTED}
+                          color={nutriTheme.COLORS.MUTED}
                           size={14}
                           style={styles.inputLabel}
                         >
@@ -284,15 +275,6 @@ class UserMeasurements extends React.Component {
                         </Text>
                         <Input
                           placeholder="Въведете възраст"
-                          iconContent={
-                            <Icon
-                              size={16}
-                              color={argonTheme.COLORS.ICON}
-                              name="ic_mail_24px"
-                              family="ArgonExtra"
-                              style={styles.inputIcons}
-                            />
-                          }
                           style={styles.input}
                           keyboardType="numeric"
                           onChangeText={(age) =>
@@ -302,7 +284,7 @@ class UserMeasurements extends React.Component {
                       </Block>
                       <Block width={width * 0.8}>
                         <Text
-                          color={argonTheme.COLORS.MUTED}
+                          color={nutriTheme.COLORS.MUTED}
                           size={14}
                           style={styles.inputLabel}
                         >
@@ -310,15 +292,6 @@ class UserMeasurements extends React.Component {
                         </Text>
                         <Input
                           placeholder="Въведете тегло (кг)"
-                          iconContent={
-                            <Icon
-                              size={16}
-                              color={argonTheme.COLORS.ICON}
-                              name="ic_mail_24px"
-                              family="ArgonExtra"
-                              style={styles.inputIcons}
-                            />
-                          }
                           style={styles.input}
                           keyboardType="numeric"
                           onChangeText={(weight) =>
@@ -328,7 +301,7 @@ class UserMeasurements extends React.Component {
                       </Block>
                       <Block width={width * 0.8}>
                         <Text
-                          color={argonTheme.COLORS.MUTED}
+                          color={nutriTheme.COLORS.MUTED}
                           size={14}
                           style={styles.inputLabel}
                         >
@@ -336,15 +309,6 @@ class UserMeasurements extends React.Component {
                         </Text>
                         <Input
                           placeholder="Въведете обиколка на врат (см)"
-                          iconContent={
-                            <Icon
-                              size={16}
-                              color={argonTheme.COLORS.ICON}
-                              name="ic_mail_24px"
-                              family="ArgonExtra"
-                              style={styles.inputIcons}
-                            />
-                          }
                           keyboardType="numeric"
                           style={styles.input}
                           onChangeText={(neck) =>
@@ -354,7 +318,7 @@ class UserMeasurements extends React.Component {
                       </Block>
                       <Block width={width * 0.8}>
                         <Text
-                          color={argonTheme.COLORS.MUTED}
+                          color={nutriTheme.COLORS.MUTED}
                           size={14}
                           style={styles.inputLabel}
                         >
@@ -362,15 +326,6 @@ class UserMeasurements extends React.Component {
                         </Text>
                         <Input
                           placeholder="Въведете обиколка на талия (см)"
-                          iconContent={
-                            <Icon
-                              size={16}
-                              color={argonTheme.COLORS.ICON}
-                              name="ic_mail_24px"
-                              family="ArgonExtra"
-                              style={styles.inputIcons}
-                            />
-                          }
                           style={styles.input}
                           keyboardType="numeric"
                           onChangeText={(waist) =>
@@ -380,7 +335,7 @@ class UserMeasurements extends React.Component {
                       </Block>
                       <Block width={width * 0.8}>
                         <Text
-                          color={argonTheme.COLORS.MUTED}
+                          color={nutriTheme.COLORS.MUTED}
                           size={14}
                           style={styles.inputLabel}
                         >
@@ -388,15 +343,6 @@ class UserMeasurements extends React.Component {
                         </Text>
                         <Input
                           placeholder="Въведете обиколка на таз (см)"
-                          iconContent={
-                            <Icon
-                              size={16}
-                              color={argonTheme.COLORS.ICON}
-                              name="ic_mail_24px"
-                              family="ArgonExtra"
-                              style={styles.inputIcons}
-                            />
-                          }
                           style={styles.input}
                           keyboardType="numeric"
                           onChangeText={(hip) =>
@@ -422,7 +368,7 @@ class UserMeasurements extends React.Component {
                         >
                           <ActivityIndicator
                             size="large"
-                            color={argonTheme.COLORS.PRIMARY}
+                            color={nutriTheme.COLORS.PRIMARY}
                           />
                         </Block>
                       ) : (
@@ -435,7 +381,7 @@ class UserMeasurements extends React.Component {
                             <Text
                               bold
                               size={14}
-                              color={argonTheme.COLORS.WHITE}
+                              color={nutriTheme.COLORS.WHITE}
                             >
                               Пратете
                             </Text>
@@ -460,7 +406,7 @@ const styles = StyleSheet.create({
     height: width * 1.6,
     backgroundColor: "#F4F5F7",
     borderRadius: 20,
-    shadowColor: argonTheme.COLORS.BLACK,
+    shadowColor: nutriTheme.COLORS.BLACK,
     shadowOffset: {
       width: 0,
       height: 4
@@ -474,7 +420,7 @@ const styles = StyleSheet.create({
     textAlign: "left"
   },
   socialConnect: {
-    backgroundColor: argonTheme.COLORS.WHITE,
+    backgroundColor: nutriTheme.COLORS.WHITE,
     borderBottomWidth: StyleSheet.hairlineWidth,
     borderColor: "#8898AA"
   },
@@ -482,7 +428,7 @@ const styles = StyleSheet.create({
     width: 120,
     height: 40,
     backgroundColor: "#fff",
-    shadowColor: argonTheme.COLORS.BLACK,
+    shadowColor: nutriTheme.COLORS.BLACK,
     shadowOffset: {
       width: 0,
       height: 4
@@ -492,7 +438,7 @@ const styles = StyleSheet.create({
     elevation: 1
   },
   socialTextButtons: {
-    color: argonTheme.COLORS.PRIMARY,
+    color: nutriTheme.COLORS.PRIMARY,
     fontWeight: "800",
     fontSize: 14
   },

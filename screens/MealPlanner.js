@@ -1,40 +1,219 @@
 import React from "react";
 import {
   StyleSheet,
-  Dimensions,
   ScrollView,
   TouchableOpacity,
   View,
   TextInput,
   ActivityIndicator
 } from "react-native";
-import { Block, theme, Text } from "galio-framework";
+import { Block, Text } from "galio-framework";
 import { EXPO_PUBLIC_OPENAI_API_KEY } from "@env";
 import RecipeWidget from "../components/RecipeWidget";
-import articles from "../constants/articles";
-const { width } = Dimensions.get("screen");
+import { getAuth } from "firebase/auth";
+import DailyCalorieRequirements from "./DailyCalorieRequirements";
+import { Card } from "../components";
+import { nutriTheme } from "../constants";
+import MacroNutrients from "./MacroNutrients";
+import CuisineDropdown from "../components/Dropdown";
+import { Ionicons } from "@expo/vector-icons";
+import { savePreferences, saveMealPlan } from "../database/setFunctions";
+import Deviations from "./Deviations";
 
 class MealPlanner extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
+      currentUser: null,
       userPreferences: {
-        Cuisine: "",
+        Cuisine: [],
+        Diet: "",
         Calories: "",
         Protein: "",
         Fat: "",
         Carbohydrates: "",
         Exclude: ""
       },
+      activityLevel: null,
+      userData: {},
+      perfectWeight: null,
+      differenceFromPerfectWeight: null,
+      health: "",
+      recommendedGoal: "",
+      selectedGoal: "",
+      dailyCaloryRequirements: [],
+      macroNutrients: [],
       isPlanGeneratedWithOpenAI: false,
       isPlanGeneratedWithGemini: false,
       mealPlanImages: {},
       mealPlan: {},
       requestFailed: false,
-      isLoading: false
+      isLoading: false,
+      isDailyCaloryLoading: true,
+      currentPage: 0,
+      itemsPerPage: 5
     };
   }
 
+  // Извиква се при първоначално зареждане на компонента.
+  componentDidMount() {
+    // Извлича се аутентикационния обект.
+    const auth = getAuth();
+    // Създава се проследимост към промените на аутентикационния статус на потребителя.
+    this.unsubscribe = auth.onAuthStateChanged((user) => {
+      // Проверява дали има активен потребител.
+      if (user) {
+        // Актуализира се състоянието с текущия потребител.
+        this.setState({ currentUser: user });
+      } else {
+        // В случай на липса на потребител, състоянието се актуализира до нулево.
+        this.setState({ currentUser: null });
+      }
+    });
+  }
+
+  // Извиква се след всяко обновяване на компонента.
+  componentDidUpdate(prevProps, prevState) {
+    // Проверява дали предишното състояние на текущия потребител се различава от текущото и дали има активен потребител.
+    if (
+      prevState.currentUser !== this.state.currentUser &&
+      this.state.currentUser
+    ) {
+      // Ако условието е изпълнено, се извиква метод за зареждане на данни.
+      this.fetchData();
+    }
+
+    if (prevState.userPreferences !== this.state.userPreferences) {
+      savePreferences(
+        this.state.currentUser.uid,
+        Number(this.state.userPreferences.Calories),
+        {
+          name: this.state.userPreferences.Diet,
+          protein: this.state.userPreferences.Protein,
+          fat: this.state.userPreferences.Fat,
+          carbs: this.state.userPreferences.Carbohydrates
+        }
+      );
+    }
+
+    if (
+      prevState.mealPlan !== this.state.mealPlan &&
+      prevState.mealPlanImages !== this.state.mealPlanImages
+    ) {
+      const aiUsed = this.state.isPlanGeneratedWithOpenAI
+        ? "mealPlanOpenAI"
+        : "mealPlanGemini";
+
+      saveMealPlan(
+        this.state.currentUser.uid,
+        aiUsed,
+        this.state.mealPlan,
+        this.state.mealPlanImages
+      );
+    }
+  }
+
+  // Извиква се преди изтриване на компонента.
+  componentWillUnmount() {
+    // Прекъсва проследяването на промените в аутентикационния статус на потребителя.
+    this.unsubscribe();
+  }
+
+  /**
+   * Извлича данни от външен източник чрез асинхронна заявка и актуализира състоянието на компонента с получените данни.
+   */
+  fetchData = async () => {
+    try {
+      // Извличане на уникалния идентификационен номер на текущия потребител.
+      const uid = this.state.currentUser.uid;
+      // Генериране на текущата дата във формат ISO и извличане на само датата.
+      const date = new Date().toISOString().slice(0, 10);
+      // Изпращане на POST заявка към NutriFit API със зададени хедъри и body на заявката.
+      const response = await fetch(
+        "https://nutri-api.noit.eu/weightStatsAndMealPlanner",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "x-api-key": "349f35fa-fafc-41b9-89ed-ff19addc3494"
+          },
+          body: JSON.stringify({
+            uid: uid,
+            date: date
+          })
+        }
+      );
+
+      // Проверка за успешен отговор от сървъра.
+      if (!response.ok) {
+        // В случай на неуспешна заявка, генерира се грешка.
+        throw new Error("Failed to fetch weight stats");
+      }
+
+      // Извличане на данните от отговора в JSON формат.
+      const weightStatsData = await response.json();
+
+      // Актуализиране на състоянието с получените данни.
+      this.setState({
+        userData: {
+          gender: weightStatsData.userDataSaveable.gender,
+          goal: weightStatsData.userDataSaveable.goal,
+          age: weightStatsData.userDataSaveable.age,
+          height: weightStatsData.userDataSaveable.height,
+          waist: weightStatsData.userDataSaveable.waist,
+          neck: weightStatsData.userDataSaveable.neck,
+          hip: weightStatsData.userDataSaveable.hip,
+          weight: weightStatsData.userDataSaveable.weight
+        },
+        perfectWeight: weightStatsData.perfectWeight,
+        differenceFromPerfectWeight: {
+          difference:
+            weightStatsData?.differenceFromPerfectWeight?.difference || 0,
+          isUnderOrAbove:
+            weightStatsData?.differenceFromPerfectWeight?.isUnderOrAbove || ""
+        },
+        health: weightStatsData.bmiIndex.health,
+        recommendedGoal: this.calculateRecommendedGoal(
+          weightStatsData.differenceFromPerfectWeight
+        ),
+        dailyCaloryRequirements: weightStatsData.dailyCaloryRequirements,
+        macroNutrients: weightStatsData.macroNutrientsData,
+        isDailyCaloryLoading: false
+      });
+    } catch (error) {
+      // В случай на грешка при извличането на данни, извеждане на съобщение за грешка в конзолата.
+      console.error("Error fetching weight stats:", error);
+    }
+  };
+
+  /**
+   * Изчислява препоръчителната цел за тегло на потребителя.
+   * @param {Object} differenceFromPerfectWeight - Обект, съдържащ разликата от идеалното тегло и информация дали потребителят е под или над нормата.
+   * @returns {string} - Препоръчителната цел за тегло, в килограми.
+   * @throws {Error} - Грешка при невъзможност за изчисляване на препоръчителната цел.
+   */
+  calculateRecommendedGoal = (differenceFromPerfectWeight) => {
+    const difference = differenceFromPerfectWeight.difference;
+    const underOrAbove = differenceFromPerfectWeight.isUnderOrAbove;
+
+    let recommendedGoal;
+
+    if (Math.abs(difference) < 2) {
+      recommendedGoal = "Запазите";
+    } else if (underOrAbove === "under" && Math.abs(difference) >= 2) {
+      recommendedGoal = "Качвате";
+    } else if (underOrAbove === "above" && Math.abs(difference) >= 2) {
+      recommendedGoal = "Сваляте";
+    }
+
+    return recommendedGoal + " (кг.)";
+  };
+
+  /**
+   * Обработва входните данни от потребителя.
+   * @param {string} key - Ключът на входните данни.
+   * @param {string|number} value - Стойността на входните данни.
+   */
   handleInputChange = (key, value) => {
     if (
       key === "Calories" ||
@@ -60,7 +239,62 @@ class MealPlanner extends React.Component {
     }
   };
 
+  /**
+   * Обработва избора на цел от страна на потребителя.
+   * @param {string} goal - Избраната цел от потребителя.
+   */
+  handleGoalSelect = (goal) => {
+    // Актуализира се състоянието с избраната цел.
+    this.setState({ selectedGoal: goal });
+  };
+
+  /**
+   * Обработва избора на калории от потребителя.
+   * @param {number} calories - Избраните калории от потребителя.
+   */
+  handleSelectedCalories = (calories) => {
+    // Актуализира се състоянието с избраните калории.
+    this.setState((prevState) => ({
+      userPreferences: {
+        ...prevState.userPreferences,
+        Calories: calories
+      }
+    }));
+  };
+
+  /**
+   * Обработва избора на диета от страна на потребителя.
+   * @param {number} protein - Избраното количество протеини от потребителя.
+   * @param {number} fat - Избраното количество мазнини от потребителя.
+   * @param {number} carbs - Избраното количество въглехидрати от потребителя.
+   * @param {string} dietName - Името на избраната диета от потребителя.
+   */
+  handleSelectedDiet = (protein, fat, carbs, dietName) => {
+    // Актуализира се състоянието с избраната диета.
+    this.setState((prevState) => ({
+      userPreferences: {
+        ...prevState.userPreferences,
+        Protein: protein,
+        Fat: fat,
+        Carbohydrates: carbs,
+        Diet: dietName
+      }
+    }));
+  };
+
+  handleSelectedCuisine = (selectedCuisines) => {
+    this.setState((prevState) => ({
+      userPreferences: {
+        ...prevState.userPreferences,
+        Cuisine: selectedCuisines // Update selected cuisines in state
+      }
+    }));
+  };
+
   render() {
+    console.log("userPreferences: ", this.state.userPreferences);
+
+    // Обект, който съдържа преводите на кухните от английски на български.
     const cuisineTranslation = {
       Italian: "Италианска",
       Bulgarian: "Българска",
@@ -68,6 +302,11 @@ class MealPlanner extends React.Component {
       French: "Френска"
     };
 
+    /**
+     * Превежда кухнята от английски на български.
+     * @param {string|string[]} englishCuisine - Кухнята или кухните, които трябва да бъдат преведени.
+     * @returns {string|string[]} - Преведената кухня или кухните.
+     */
     translateCuisine = (englishCuisine) => {
       if (Array.isArray(englishCuisine)) {
         return englishCuisine.map(
@@ -78,12 +317,14 @@ class MealPlanner extends React.Component {
       }
     };
 
+    // Превеждане на предпочитаната кухня на потребителя и извеждане на преведената информация в конзолата.
     const translatedCuisine = translateCuisine(
       this.state.userPreferences.Cuisine
     );
 
     let promptCuisine;
 
+    // Генериране на фразата за предпочитаната кухня на потребителя.
     if (Array.isArray(translatedCuisine)) {
       promptCuisine = translatedCuisine.join(", ");
     } else {
@@ -92,11 +333,12 @@ class MealPlanner extends React.Component {
     console.log("TRANSLATED --->", promptCuisine);
     let cuisinePhrase;
 
+    // Генериране на фразата за предпочитаната кухня на потребителя.
     if (Array.isArray(this.state.userPreferences.Cuisine)) {
       if (this.state.userPreferences.Cuisine.length === 0) {
         cuisinePhrase = "всяка";
       } else if (this.state.userPreferences.Cuisine.length === 1) {
-        cuisinePhrase = this.state.userPreferences.Cuisine[0];
+        cuisinePhrase = translatedCuisine[0];
       } else {
         cuisinePhrase = "следните";
       }
@@ -104,6 +346,8 @@ class MealPlanner extends React.Component {
       cuisinePhrase = this.state.userPreferences.Cuisine;
     }
     console.log("cuisinePhrase --->", cuisinePhrase);
+
+    // промпт за OpenAI и Gemini.
     const prompt = `Вие сте опитен диетолог, който наблюдава пациентите да консумират само ядлива и традиционна храна от
       ${cuisinePhrase} кухня/кухни (${promptCuisine}). Фокусирайте се върху създаването на ТОЧЕН, разнообразен и вкусен дневен хранителен план, съставен от следните ограничения: калории (${
       this.state.userPreferences.Calories
@@ -155,6 +399,11 @@ class MealPlanner extends React.Component {
             'dessert':{'name':'string','totals':{'calories':number,'protein':number,'fat':number,'carbohydrates':number,'grams':number}, 'ingredients':['quantity ingredient','quantity ingredient','quantity ingredient','quantity ingredient','quantity ingredient'...], 'instructions':['1.string','2.string','3.string','4.string'...], 'recipeQuantity': number (in grams)}
           }`;
 
+    /**
+     * Проверява общите стойности в даден обект или масив от обекти.
+     * @param {Object|Object[]} obj - Обект или масив от обекти, които трябва да бъдат проверени.
+     * @throws {Error} - Генерира се грешка, ако стойностите в обекта не са числа.
+     */
     checkTotals = (obj) => {
       if (Array.isArray(obj)) {
         obj.forEach((item) => checkTotals(item));
@@ -168,15 +417,19 @@ class MealPlanner extends React.Component {
             }
           }
         }
-        // Recursively check the nested objects
+        // Рекурсивно проверява вложените обекти
         for (let key in obj) {
           checkTotals(obj[key]);
         }
       }
     };
 
+    /**
+     * Генерира план за хранене с помощта на OpenAI модел.
+     */
     generatePlanWithOpenAI = async () => {
       try {
+        // Актуализира състоянието, за да покаже, че планът се генерира с OpenAI модела и че заявката е в процес на обработка.
         this.setState({
           isPlanGeneratedWithOpenAI: true,
           isPlanGeneratedWithBgGPT: false,
@@ -184,6 +437,7 @@ class MealPlanner extends React.Component {
           isLoading: true
         });
         console.log("fetching openai");
+        // Изпраща заявка към OpenAI API за генериране на план за хранене.
         const response = await fetch(
           "https://api.openai.com/v1/chat/completions",
           {
@@ -205,6 +459,7 @@ class MealPlanner extends React.Component {
         );
 
         if (!response.ok) {
+          // Актуализира състоянието в случай на грешка при заявката към OpenAI API.
           this.setState({
             requestFailed: true
           });
@@ -213,6 +468,7 @@ class MealPlanner extends React.Component {
         console.log("res: ", response);
         const responseData = await response.json();
 
+        // Декодира и обработва отговора от OpenAI API.
         const unescapedData = responseData.choices[0].message.content;
         const escapedData = decodeURIComponent(unescapedData);
         console.log("escapedData: ", escapedData);
@@ -221,10 +477,12 @@ class MealPlanner extends React.Component {
 
         console.log("OPENAI: ", data);
 
+        // Филтрира обекта с данни за плана за хранене, като премахва стойностите за общи стойности (totals).
         const filteredArr = Object.fromEntries(
           Object.entries(data).filter(([key]) => key !== "totals")
         );
 
+        // Обект, който ще съдържа връзките към изображенията на ястията от плана за хранене.
         const mealPlanImagesData = {
           breakfast: {
             main: ""
@@ -240,12 +498,13 @@ class MealPlanner extends React.Component {
           }
         };
 
-        // Iterate over each meal and make a separate image generation request
+        // Обхождане на всяко ястие от плана и извършване на отделна заявка за генериране на изображение.
         for (const mealKey of Object.keys(filteredArr)) {
           const mealAppetizer = filteredArr[mealKey].appetizer;
           const mealMain = filteredArr[mealKey].main;
           const mealDessert = filteredArr[mealKey].dessert;
 
+          // Функция за извличане на изображение от името на ястието.
           async function fetchImage(name) {
             try {
               let response = await fetch(
@@ -269,16 +528,16 @@ class MealPlanner extends React.Component {
             }
           }
 
+          // Извличане на изображенията за апетитите, основните ястия и десертите.
           const imageAppetizer =
             mealKey === "lunch" ? await fetchImage(mealAppetizer.name) : null;
-
           const imageMain = await fetchImage(mealMain.name);
-
           const imageDessert =
             mealKey === "lunch" || mealKey === "dinner"
               ? await fetchImage(mealDessert.name)
               : null;
 
+          // Обработка на отговорите за изображенията и актуализиране на състоянието с връзките към изображенията на ястията.
           const imageAppetizerResponseData =
             imageAppetizer !== null ? await imageAppetizer.json() : null;
           const imageMainResponseData = await imageMain.json();
@@ -309,12 +568,14 @@ class MealPlanner extends React.Component {
 
         console.log("mealPlanImagesData:", mealPlanImagesData);
 
+        // Актуализира състоянието с връзките към изображенията на ястията и плана за хранене, които са били генерирани с OpenAI модела.
         this.setState({
           mealPlanImages: mealPlanImagesData,
           mealPlan: data,
           isLoading: false
         });
       } catch (error) {
+        // Актуализира състоянието в случай на грешка при генериране на плана за хранене.
         this.setState({
           requestFailed: true,
           isLoading: false
@@ -323,8 +584,12 @@ class MealPlanner extends React.Component {
       }
     };
 
+    /**
+     * Генерира план за хранене с помощта на Gemini модел.
+     */
     generatePlanWithGemini = async () => {
       try {
+        // Актуализира състоянието, за да покаже, че планът се генерира с Gemini модела и че заявката е в процес на обработка.
         this.setState({
           isPlanGeneratedWithOpenAI: false,
           isPlanGeneratedWithGemini: true,
@@ -333,6 +598,7 @@ class MealPlanner extends React.Component {
         });
         console.log("PROMPT --->", prompt);
         console.log("fetching gemini");
+        // Изпраща заявка към NutriFit API за генериране на план за хранене с Gemini модела.
         const response = await fetch(
           "https://nutri-api.noit.eu/geminiGenerateResponse",
           {
@@ -349,6 +615,7 @@ class MealPlanner extends React.Component {
 
         console.log("Response from backend:", responseData.aiResponse);
 
+        // Преобразува отговора от бекенда в JSON формат и проверява за валидност.
         const stringToRepair = responseData.aiResponse
           .replace(/^```json([\s\S]*?)```$/, "$1")
           .replace(/^```JSON([\s\S]*?)```$/, "$1")
@@ -365,6 +632,7 @@ class MealPlanner extends React.Component {
 
         console.log("jsonObject: ", jsonObject);
 
+        // Обект, който ще съдържа връзките към изображенията на ястията от плана за хранене, генериран с Gemini модела.
         const mealPlanImagesData = {
           breakfast: {
             main: ""
@@ -379,20 +647,15 @@ class MealPlanner extends React.Component {
             dessert: ""
           }
         };
-        const updatedMealPlanImagesData = {};
-        const updatedMealPlan = {};
+
+        // Обхождане на всяко ястие от плана и извършване на отделна заявка за генериране на изображение.
         for (const mealKey of Object.keys(jsonObject)) {
           if (mealKey !== "totals") {
             const mealAppetizer = jsonObject[mealKey].appetizer;
             const mealMain = jsonObject[mealKey].main;
             const mealDessert = jsonObject[mealKey].dessert;
 
-            // console.log("meal: ", meal);
-            // console.log("meal name: ", meal.name);
-
-            //NutriFit: cx=10030740e88c842af, key=AIzaSyDqUez1TEmLSgZAvIaMkWfsq9rSm0kDjIw
-            //NutriFit2: cx=258e213112b4b4492, key=AIzaSyArE48NFh1befjjDxpSrJ0eBgQh_OmQ7RA
-            //NutriFit3: cx=527000b0fabcc4dab, key=AIzaSyDwqaIBGxmhEc6GVR3lwOVk_-0EpwKvOPA
+            // Функция за извличане на изображение от името на ястието.
             async function fetchImage(name) {
               try {
                 let response = await fetch(
@@ -416,27 +679,24 @@ class MealPlanner extends React.Component {
               }
             }
 
+            // Извличане на изображенията за апетитите, основните ястия и десертите.
             const imageAppetizer =
               mealKey === "lunch" ? await fetchImage(mealAppetizer.name) : null;
-
             const imageMain = await fetchImage(mealMain.name);
-
             const imageDessert =
               mealKey === "lunch" || mealKey === "dinner"
                 ? await fetchImage(mealDessert.name)
                 : null;
 
+            // Обработка на отговорите за изображенията и актуализиране на състоянието с връзките към изображенията на ястията.
             const imageAppetizerResponseData =
               imageAppetizer !== null ? await imageAppetizer.json() : null;
             const imageMainResponseData = await imageMain.json();
             const imageDessertResponseData =
               imageDessert !== null ? await imageDessert.json() : null;
 
-            console.log("imageDessert: ", imageDessert, mealKey);
-            // console.log(
-            //   `Image Generation Response for ${mealAppetizer.name}: `,
-            //   imageAppetizerResponseData.items[0].link
-            // );
+            // console.log("imageDessert: ", imageDessert, mealKey);
+
             if (
               imageAppetizerResponseData !== null &&
               imageAppetizerResponseData?.items?.[0]?.link
@@ -457,27 +717,17 @@ class MealPlanner extends React.Component {
               mealPlanImagesData[mealKey].dessert =
                 imageDessertResponseData.items[0].link;
             }
-
-            updatedMealPlanImagesData[mealKey] = {
-              appetizer: imageAppetizerResponseData?.items?.[0]?.link || "",
-              main: imageMainResponseData.items[0].link,
-              dessert: imageDessertResponseData?.items?.[0]?.link || ""
-            };
-
-            updatedMealPlan[mealKey] = {
-              appetizer: jsonObject[mealKey].appetizer,
-              main: jsonObject[mealKey].main,
-              dessert: jsonObject[mealKey].dessert
-            };
           }
         }
 
+        // Актуализира състоянието с връзките към изображенията на ястията и плана за хранене, които са били генерирани с Gemini модела.
         this.setState({
-          mealPlanImages: updatedMealPlanImagesData,
-          mealPlan: updatedMealPlan,
+          mealPlanImages: mealPlanImagesData,
+          mealPlan: jsonObject,
           isLoading: false
         });
       } catch (error) {
+        // Актуализира състоянието в случай на грешка при генериране на плана за хранене.
         this.setState({
           requestFailed: true,
           isLoading: false
@@ -486,103 +736,260 @@ class MealPlanner extends React.Component {
       }
     };
 
-    const { isLoading, requestFailed, userPreferences } = this.state;
+    /**
+     * Отива към предходната страница в навигацията.
+     */
+    goToPreviousPage = () => {
+      this.setState((prevState) => ({
+        currentPage: prevState.currentPage - 1
+      }));
+    };
+
+    /**
+     * Отива към следващата страница в навигацията.
+     */
+    goToNextPage = () => {
+      this.setState((prevState) => ({
+        currentPage: prevState.currentPage + 1
+      }));
+    };
+
+    /**
+     * Превежда типа на ястието от английски на български.
+     * @param {string} mealType - Типа на ястието на английски.
+     * @returns {string} - Преведеният тип на ястието на български.
+     */
+    translateMealType = (mealType) => {
+      switch (mealType) {
+        case "breakfast":
+          return "Закуска";
+        case "lunch":
+          return "Обяд";
+        case "dinner":
+          return "Вечеря";
+        default:
+          return mealType; // Връща оригиналния тип на ястието, ако преводът не е наличен
+      }
+    };
+
+    const {
+      isLoading,
+      isDailyCaloryLoading,
+      requestFailed,
+      userPreferences,
+      activityLevel,
+      dailyCaloryRequirements,
+      macroNutrients,
+      currentPage,
+      itemsPerPage,
+      isPlanGeneratedWithOpenAI
+    } = this.state;
+
+    const levels = [1, 2, 3, 4, 5, 6];
+
+    console.log("activityLevel: ", activityLevel);
+
+    const startIndex = currentPage * itemsPerPage;
+    const endIndex = startIndex + itemsPerPage;
 
     return (
       <View style={styles.container}>
         <ScrollView contentContainerStyle={styles.scrollViewContent}>
-          <View style={styles.inputContainer}>
-            <TextInput
-              placeholder="Cuisine"
-              value={userPreferences.Cuisine}
-              onChangeText={(text) => this.handleInputChange("Cuisine", text)}
-              style={styles.input}
-            />
-            <TextInput
-              placeholder="Calories"
-              value={userPreferences.Calories}
-              onChangeText={(text) => this.handleInputChange("Calories", text)}
-              style={styles.input}
-              keyboardType="numeric"
-            />
-            <TextInput
-              placeholder="Protein"
-              value={userPreferences.Protein}
-              onChangeText={(text) => this.handleInputChange("Protein", text)}
-              style={styles.input}
-              keyboardType="numeric"
-            />
-            <TextInput
-              placeholder="Fat"
-              value={userPreferences.Fat}
-              onChangeText={(text) => this.handleInputChange("Fat", text)}
-              style={styles.input}
-              keyboardType="numeric"
-            />
-            <TextInput
-              placeholder="Carbohydrates"
-              value={userPreferences.Carbohydrates}
-              onChangeText={(text) =>
-                this.handleInputChange("Carbohydrates", text)
-              }
-              style={styles.input}
-              keyboardType="numeric"
-            />
-            <TextInput
-              placeholder="Exclude"
-              value={userPreferences.Exclude}
-              onChangeText={(text) => this.handleInputChange("Exclude", text)}
-              style={styles.input}
-            />
-          </View>
-          {isLoading && (
-            <View style={styles.loaderContainer}>
-              <ActivityIndicator size="large" color="#0000ff" />
+          <Card>
+            <Text style={styles.title}>Изберете ниво на натовареност:</Text>
+            <View style={styles.buttonContainer}>
+              {levels.map((level) => (
+                <TouchableOpacity
+                  key={level}
+                  style={[
+                    styles.button,
+                    activityLevel === level ? styles.activeButton : null
+                  ]}
+                  onPress={() => this.setState({ activityLevel: level })}
+                >
+                  <Text style={styles.buttonText}>{level}</Text>
+                </TouchableOpacity>
+              ))}
             </View>
+          </Card>
+          {activityLevel && (
+            <Card style={{ marginBottom: 20 }}>
+              <Text style={styles.title}>
+                Изберете желаната от вас цел и съответните калории, които трябва
+                да приемате на ден според желания резултат:
+              </Text>
+              {isDailyCaloryLoading ? (
+                <View style={styles.loaderContainer}>
+                  <ActivityIndicator size="large" color="#0000ff" />
+                </View>
+              ) : (
+                <Block>
+                  <DailyCalorieRequirements
+                    dailyCaloryRequirementsArray={dailyCaloryRequirements}
+                    activityLevel={activityLevel}
+                    onGoalSelect={this.handleGoalSelect}
+                    onCaloriesSelect={this.handleSelectedCalories}
+                  />
+                  {this.state.selectedGoal !== "" && (
+                    <MacroNutrients
+                      macroNutrientsArray={macroNutrients}
+                      activityLevel={activityLevel}
+                      selectedGoal={this.state.selectedGoal}
+                      onDietSelect={this.handleSelectedDiet}
+                    />
+                  )}
+                </Block>
+              )}
+            </Card>
           )}
-          {requestFailed && <Text>kuro mi dedov</Text>}
-          <View style={styles.buttonContainer}>
-            <TouchableOpacity
-              style={styles.button}
-              onPress={generatePlanWithOpenAI}
-            >
-              <Text style={styles.buttonText}>Generate with OpenAI</Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={styles.button}
-              onPress={generatePlanWithGemini}
-            >
-              <Text style={styles.buttonText}>Generate with Gemini</Text>
-            </TouchableOpacity>
-          </View>
+          {userPreferences.Diet && (
+            <Card style={{ marginBottom: 20, marginTop: -5 }}>
+              <Text style={styles.title} size={20}>
+                Създайте хранителен план с NutriFit
+              </Text>
+              <View style={styles.inputContainer}>
+                <TextInput
+                  placeholder="Калории"
+                  value={userPreferences.Calories}
+                  onChangeText={(text) =>
+                    this.handleInputChange("Calories", text)
+                  }
+                  style={styles.input}
+                  keyboardType="numeric"
+                />
+                <TextInput
+                  placeholder="Протеини"
+                  value={userPreferences.Protein}
+                  onChangeText={(text) =>
+                    this.handleInputChange("Protein", text)
+                  }
+                  style={styles.input}
+                  keyboardType="numeric"
+                />
+                <TextInput
+                  placeholder="Мазнини"
+                  value={userPreferences.Fat}
+                  onChangeText={(text) => this.handleInputChange("Fat", text)}
+                  style={styles.input}
+                  keyboardType="numeric"
+                />
+                <TextInput
+                  placeholder="Въглехидрати"
+                  value={userPreferences.Carbohydrates}
+                  onChangeText={(text) =>
+                    this.handleInputChange("Carbohydrates", text)
+                  }
+                  style={styles.input}
+                  keyboardType="numeric"
+                />
+                <TextInput
+                  placeholder="Какво да не се включва"
+                  value={userPreferences.Exclude}
+                  onChangeText={(text) =>
+                    this.handleInputChange("Exclude", text)
+                  }
+                  style={styles.input}
+                />
+                <CuisineDropdown onCuisineSelect={this.handleSelectedCuisine} />
+              </View>
 
+              {isLoading && (
+                <View style={styles.loaderContainer}>
+                  <ActivityIndicator size="large" color="#0000ff" />
+                </View>
+              )}
+              {requestFailed && (
+                <Text style={styles.title} size={20}>
+                  Не намерихме подходящ хранителен план за вас. Опитайте отново.
+                </Text>
+              )}
+              <View style={[styles.buttonContainer, { gap: 10 }]}>
+                <TouchableOpacity
+                  style={[styles.button, { marginHorizontal: 0 }]}
+                  onPress={generatePlanWithOpenAI}
+                >
+                  <Text style={styles.buttonText}>
+                    Създайте хранителен план с OpenAI
+                  </Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  style={[styles.button, { marginHorizontal: 0 }]}
+                  onPress={generatePlanWithGemini}
+                >
+                  <Text style={styles.buttonText}>
+                    Създайте хранителен план с Gemini
+                  </Text>
+                </TouchableOpacity>
+              </View>
+            </Card>
+          )}
           {Object.keys(this.state.mealPlan).map((mealType, index) => {
             const meal = this.state.mealPlan[mealType];
-            const mealImages = this.state.mealPlanImages[mealType]; // Get all images for the meal type
+            const mealImages = this.state.mealPlanImages[mealType];
 
             return (
               <React.Fragment key={index}>
-                {/* Map through each item in the meal type */}
-                {Object.keys(meal).map((itemType) => {
-                  const item = meal[itemType]; // Get the item details
-                  const mealImage = mealImages ? mealImages[itemType] : null; // Get the image for the item
+                {index === currentPage && (
+                  <React.Fragment>
+                    {Object.keys(this.state.mealPlan).length !== 0 && (
+                      <React.Fragment>
+                        <Text style={styles.mealType}>
+                          {translateMealType(mealType).toUpperCase()}
+                        </Text>
+                        <View style={styles.paginationContainer}>
+                          <TouchableOpacity
+                            onPress={goToPreviousPage}
+                            disabled={currentPage === 0}
+                          >
+                            <Ionicons
+                              name="ios-arrow-back"
+                              size={24}
+                              color={currentPage === 0 ? "gray" : "black"}
+                            />
+                          </TouchableOpacity>
+                          <Text>Страница {currentPage + 1} от 3</Text>
+                          <TouchableOpacity
+                            onPress={goToNextPage}
+                            disabled={currentPage === 2}
+                          >
+                            <Ionicons
+                              name="ios-arrow-forward"
+                              size={24}
+                              color={currentPage === 2 ? "gray" : "black"}
+                            />
+                          </TouchableOpacity>
+                        </View>
+                      </React.Fragment>
+                    )}
+                    {meal &&
+                      Object.keys(meal).map((itemType) => {
+                        const item = meal[itemType];
+                        const mealImage = mealImages
+                          ? mealImages[itemType]
+                          : null;
 
-                  // Check if item exists before rendering RecipeWidget
-                  if (item) {
-                    return (
-                      <Block style={styles.inputContainer}>
-                        <RecipeWidget
-                          key={`${mealType}-${itemType}`}
-                          image={mealImage}
-                          item={item}
-                        />
-                      </Block>
-                    );
-                  } else {
-                    // Handle case where item is undefined
-                    return null;
-                  }
-                })}
+                        if (item) {
+                          return (
+                            <Block
+                              style={styles.inputContainer}
+                              key={`${mealType}-${itemType}`}
+                            >
+                              <RecipeWidget image={mealImage} item={item} />
+                            </Block>
+                          );
+                        } else {
+                          return null;
+                        }
+                      })}
+                    {Object.keys(this.state.mealPlan).length !== 0 && (
+                      <Deviations
+                        mealPlan={this.state.mealPlan}
+                        userPreferences={userPreferences}
+                        isPlanGeneratedWithOpenAI={isPlanGeneratedWithOpenAI}
+                      />
+                    )}
+                  </React.Fragment>
+                )}
               </React.Fragment>
             );
           })}
@@ -596,14 +1003,25 @@ const styles = StyleSheet.create({
   container: {
     flex: 1
   },
+  mealType: {
+    fontWeight: "bold",
+    fontSize: 30,
+    marginTop: 5,
+    textAlign: "center"
+  },
+  paginationContainer: {
+    flexDirection: "row",
+    justifyContent: "center",
+    alignItems: "center",
+    marginVertical: 15,
+    gap: 10
+  },
   scrollViewContent: {
-    flexGrow: 1,
-    justifyContent: "space-between"
+    flexGrow: 1
   },
   inputContainer: {
     paddingHorizontal: 20,
-    paddingTop: 20,
-    paddingBottom: 20
+    paddingBottom: 15
   },
   input: {
     borderWidth: 1,
@@ -620,7 +1038,7 @@ const styles = StyleSheet.create({
   },
   button: {
     flex: 1,
-    backgroundColor: "blue",
+    backgroundColor: "#9a99ff",
     borderRadius: 10,
     justifyContent: "center",
     marginHorizontal: 5
@@ -631,9 +1049,39 @@ const styles = StyleSheet.create({
     fontSize: 18
   },
   loaderContainer: {
+    marginBottom: 30,
     flex: 1,
     justifyContent: "center",
     alignItems: "center"
+  },
+  title: {
+    textAlign: "center",
+    lineHeight: 19,
+    fontWeight: "bold", // Change fontWeight to "bold" for a heavier font
+    color: nutriTheme.COLORS.HEADER,
+    margin: 10
+  },
+  dropdownContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginBottom: 10
+  },
+  dropdownLabel: {
+    marginRight: 10,
+    fontSize: 16,
+    color: "#000" // Set label text color to ensure visibility
+  },
+  dropdownPicker: {
+    flex: 1,
+    borderWidth: 1,
+    borderColor: "gray",
+    borderRadius: 15,
+    padding: 10,
+    backgroundColor: "#fff" // Set a background color for better visibility
+  },
+  pickerItem: {
+    fontSize: 16, // Adjust item font size for better visibility
+    color: "#000" // Set item text color to ensure visibility
   }
 });
 

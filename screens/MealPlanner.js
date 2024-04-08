@@ -17,11 +17,7 @@ import { nutriTheme } from "../constants";
 import MacroNutrients from "./MacroNutrients";
 import CuisineDropdown from "../components/Dropdown";
 import { Ionicons } from "@expo/vector-icons";
-import {
-  savePreferences,
-  saveMealPlan,
-  saveDeviations
-} from "../database/setFunctions";
+import { savePreferences, saveMealPlan } from "../database/setFunctions";
 import Deviations from "./Deviations";
 
 class MealPlanner extends React.Component {

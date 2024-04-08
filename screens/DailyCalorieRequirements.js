@@ -13,14 +13,6 @@ class DailyCalorieRequirements extends Component {
     };
   }
 
-  // componentDidMount() {
-  //   // Check if the dailyCaloryRequirementsArray prop exists
-  //   if (this.props.dailyCaloryRequirementsArray) {
-  //     // If the prop exists, stop loading
-  //     this.setState({ loading: false });
-  //   }
-  // }
-
   // Function to handle button click and update state with clicked calories
   handleCaloriesButtonClick = (index, calories, goal) => {
     this.setState({ selectedButtonIndex: index });
@@ -30,18 +22,6 @@ class DailyCalorieRequirements extends Component {
 
   render() {
     const { dailyCaloryRequirementsArray, activityLevel } = this.props;
-    // const { loading } = this.state;
-
-    // if (loading) {
-    //   // Render spinner while loading
-    //   return (
-    //     <Spinner
-    //       visible={true}
-    //       textContent={"Зареждане..."}
-    //       textStyle={styles.spinnerText}
-    //     />
-    //   );
-    // }
 
     const selectedLevelData = dailyCaloryRequirementsArray[activityLevel - 1];
 
@@ -57,7 +37,6 @@ class DailyCalorieRequirements extends Component {
         <TouchableOpacity
           style={[
             styles.button,
-            //styles.weightLossButton,
             this.state.selectedButtonIndex === 1
               ? { borderColor: "#9a99ff", backgroundColor: "#CFD2DB" }
               : null
@@ -103,7 +82,6 @@ class DailyCalorieRequirements extends Component {
         <TouchableOpacity
           style={[
             styles.button,
-            //styles.weightLossButton,
             this.state.selectedButtonIndex === 3
               ? { borderColor: "#9a99ff", backgroundColor: "#CFD2DB" }
               : null
@@ -126,7 +104,6 @@ class DailyCalorieRequirements extends Component {
         <TouchableOpacity
           style={[
             styles.button,
-            //styles.weightMaintainButton,
             this.state.selectedButtonIndex === 4
               ? { borderColor: "#9a99ff", backgroundColor: "#CFD2DB" }
               : null
@@ -148,7 +125,6 @@ class DailyCalorieRequirements extends Component {
         <TouchableOpacity
           style={[
             styles.button,
-            //styles.weightGainButton,
             this.state.selectedButtonIndex === 5
               ? { borderColor: "#9a99ff", backgroundColor: "#CFD2DB" }
               : null

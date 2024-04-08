@@ -7,7 +7,7 @@ class MacroNutrients extends Component {
     this.state = {
       tooltipVisible: false,
       tooltipName: "",
-      selectedDiet: null // Add selectedDiet in state
+      selectedDiet: null
     };
   }
 

@@ -8,7 +8,7 @@ import {
   TouchableOpacity,
   ActivityIndicator
 } from "react-native";
-import { Block, Checkbox, Text, theme } from "galio-framework";
+import { Block, Text } from "galio-framework";
 import { Button, Icon, Input } from "../components";
 import { Images, nutriTheme } from "../constants";
 import { fetchAdditionalUserData } from "../database/getFunctions";

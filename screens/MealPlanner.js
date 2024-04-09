@@ -467,9 +467,9 @@ class MealPlanner extends React.Component {
         }
         console.log("res: ", response);
         const responseData = await response.json();
-
+        const responseJson = responseData.choices[0].message.content;
         // Декодира и обработва отговора от OpenAI API.
-        const unescapedData = responseData.choices[0].message.content;
+        const unescapedData = responseJson;
         const escapedData = decodeURIComponent(unescapedData);
         console.log("escapedData: ", escapedData);
 
@@ -612,26 +612,25 @@ class MealPlanner extends React.Component {
         );
 
         const responseData = await response.json();
+        const responseJson = responseData.aiResponse;
+        console.log("Response from backend:", responseJson);
 
-        console.log("Response from backend:", responseData.aiResponse);
-
-        // Преобразува отговора от бекенда в JSON формат и проверява за валидност.
-        const stringToRepair = responseData.aiResponse
+        const stringToRepair = responseJson
           .replace(/^```json([\s\S]*?)```$/, "$1")
           .replace(/^```JSON([\s\S]*?)```$/, "$1")
           .replace(/^'|'$/g, "")
           .trim();
-
         let jsonObject;
         try {
+          console.log("stringToRepair: ", stringToRepair);
           jsonObject = JSON.parse(stringToRepair);
           checkTotals(jsonObject);
+          console.log("jsonObject11111: ", jsonObject);
         } catch (parseError) {
           throw new Error("Invalid JSON response from the server");
         }
 
         console.log("jsonObject: ", jsonObject);
-
         // Обект, който ще съдържа връзките към изображенията на ястията от плана за хранене, генериран с Gemini модела.
         const mealPlanImagesData = {
           breakfast: {

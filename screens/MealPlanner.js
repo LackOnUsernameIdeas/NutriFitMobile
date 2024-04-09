@@ -8,6 +8,7 @@ import {
   ActivityIndicator
 } from "react-native";
 import { Block, Text } from "galio-framework";
+//import { EXPO_PUBLIC_OPENAI_API_KEY } from "@env";
 import { EXPO_PUBLIC_OPENAI_API_KEY } from "@env";
 import RecipeWidget from "../components/RecipeWidget";
 import { getAuth } from "firebase/auth";

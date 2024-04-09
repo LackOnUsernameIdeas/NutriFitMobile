@@ -425,6 +425,14 @@ class MealPlanner extends React.Component {
       }
     };
 
+    isValidJson = (jsonObject) => {
+      return (
+        jsonObject &&
+        jsonObject.breakfast &&
+        jsonObject.lunch &&
+        jsonObject.dinner
+      );
+    };
     /**
      * Генерира план за хранене с помощта на OpenAI модел.
      */
@@ -475,6 +483,10 @@ class MealPlanner extends React.Component {
         console.log("escapedData: ", escapedData);
 
         const data = JSON.parse(escapedData);
+
+        if (!isValidJson(data)) {
+          throw new Error("Invalid JSON structure");
+        }
 
         console.log("OPENAI: ", data);
 
@@ -629,6 +641,10 @@ class MealPlanner extends React.Component {
           console.log("jsonObject11111: ", jsonObject);
         } catch (parseError) {
           throw new Error("Invalid JSON response from the server");
+        }
+
+        if (!isValidJson(jsonObject)) {
+          throw new Error("Invalid JSON structure");
         }
 
         console.log("jsonObject: ", jsonObject);

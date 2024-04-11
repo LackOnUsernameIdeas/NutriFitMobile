@@ -10,11 +10,11 @@ import {
 import { Block, Text } from "galio-framework";
 import { Button, Icon, Input } from "../components";
 import { Images, nutriTheme } from "../constants";
-import {
-  getAuth,
-  createUserWithEmailAndPassword,
-  signInWithEmailAndPassword
-} from "firebase/auth";
+// import {
+//   getAuth,
+//   createUserWithEmailAndPassword,
+//   signInWithEmailAndPassword
+// } from "firebase/auth";
 
 const { width, height } = Dimensions.get("screen");
 
@@ -29,66 +29,70 @@ class Register extends React.Component {
   }
 
   handleSignUp = () => {
-    const { email, password } = this.state;
-    const auth = getAuth();
-
-    createUserWithEmailAndPassword(auth, email, password)
-      .then(() => {
-        // Handle successful registration
-        console.log("User registered successfully!");
-
-        // Now let's log in the user
-        signInWithEmailAndPassword(auth, email, password)
-          .then(() => {
-            // Handle successful sign-in
-            console.log("User logged in successfully!");
-            // Redirect the user to the UserMeasurements
-            this.props.navigation.navigate("UserMeasurements");
-          })
-          .catch((error) => {
-            // Handle sign-in errors
-            console.error("Error signing in after registration:", error);
-            // You might want to display an error message to the user here
-          });
-      })
-      .catch((error) => {
-        // Handle registration errors
-        let errorMessage;
-        switch (error.code) {
-          case "auth/invalid-email":
-            errorMessage =
-              "Email-ът ви е невалиден. Проверете за грешки в изписването.";
-            break;
-          case "auth/weak-password":
-            errorMessage = "Паролата ви е твърде слаба.";
-            break;
-          case "auth/email-already-exists":
-            errorMessage =
-              "Този еmail е регистриран. Да не би да искахте да влезете в профила ви?";
-            break;
-          case "auth/invalid-password":
-            errorMessage = "Паролата ви не е правилна.";
-            break;
-          case "auth/missing-password":
-            errorMessage = "Моля напишете вашата парола.";
-            break;
-          case "auth/email-already-in-use":
-            errorMessage =
-              "Този еmail е регистриран. Да не би да искахте да влезете в профила ви?";
-            break;
-          case "auth/weak-password":
-            errorMessage = "Паролата ви трябва да бъде поне 6 символа.";
-            break;
-          case "auth/missing-email":
-            errorMessage = "Моля напишете вашия еmail.";
-            break;
-          default:
-            errorMessage = "Грешка се случи: " + error.message;
-        }
-        this.setState({ errorMessage });
-        console.error("Error registering user:", error);
-      });
+    this.props.navigation.navigate("UserMeasurements");
   };
+
+  // handleSignUp = () => {
+  //   const { email, password } = this.state;
+  //   const auth = getAuth();
+
+  //   createUserWithEmailAndPassword(auth, email, password)
+  //     .then(() => {
+  //       // Handle successful registration
+  //       console.log("User registered successfully!");
+
+  //       // Now let's log in the user
+  //       signInWithEmailAndPassword(auth, email, password)
+  //         .then(() => {
+  //           // Handle successful sign-in
+  //           console.log("User logged in successfully!");
+  //           // Redirect the user to the UserMeasurements
+  //           this.props.navigation.navigate("UserMeasurements");
+  //         })
+  //         .catch((error) => {
+  //           // Handle sign-in errors
+  //           console.error("Error signing in after registration:", error);
+  //           // You might want to display an error message to the user here
+  //         });
+  //     })
+  //     .catch((error) => {
+  //       // Handle registration errors
+  //       let errorMessage;
+  //       switch (error.code) {
+  //         case "auth/invalid-email":
+  //           errorMessage =
+  //             "Email-ът ви е невалиден. Проверете за грешки в изписването.";
+  //           break;
+  //         case "auth/weak-password":
+  //           errorMessage = "Паролата ви е твърде слаба.";
+  //           break;
+  //         case "auth/email-already-exists":
+  //           errorMessage =
+  //             "Този еmail е регистриран. Да не би да искахте да влезете в профила ви?";
+  //           break;
+  //         case "auth/invalid-password":
+  //           errorMessage = "Паролата ви не е правилна.";
+  //           break;
+  //         case "auth/missing-password":
+  //           errorMessage = "Моля напишете вашата парола.";
+  //           break;
+  //         case "auth/email-already-in-use":
+  //           errorMessage =
+  //             "Този еmail е регистриран. Да не би да искахте да влезете в профила ви?";
+  //           break;
+  //         case "auth/weak-password":
+  //           errorMessage = "Паролата ви трябва да бъде поне 6 символа.";
+  //           break;
+  //         case "auth/missing-email":
+  //           errorMessage = "Моля напишете вашия еmail.";
+  //           break;
+  //         default:
+  //           errorMessage = "Грешка се случи: " + error.message;
+  //       }
+  //       this.setState({ errorMessage });
+  //       console.error("Error registering user:", error);
+  //     });
+  // };
 
   render() {
     const { navigation } = this.props; // Assuming you're using React Navigation

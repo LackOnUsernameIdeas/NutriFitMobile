@@ -9,12 +9,12 @@ import Register from "../screens/Register";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { createDrawerNavigator } from "@react-navigation/drawer";
 import { createStackNavigator } from "@react-navigation/stack";
-import { collection, onSnapshot } from "firebase/firestore";
-import { db } from "../database/connection";
+// import { collection, onSnapshot } from "firebase/firestore";
+// import { db } from "../database/connection";
 import LogIn from "../screens/LogIn";
-import { getAuth, onAuthStateChanged } from "firebase/auth";
+// import { getAuth, onAuthStateChanged } from "firebase/auth";
 import UserMeasurements from "../screens/UserMeasurements";
-import { fetchAdditionalUserData } from "../database/getFunctions";
+// import { fetchAdditionalUserData } from "../database/getFunctions";
 
 const { width } = Dimensions.get("screen");
 
@@ -22,23 +22,23 @@ const Stack = createStackNavigator();
 const Drawer = createDrawerNavigator();
 
 export default function OnboardingStack(props) {
-  const [initializing, setInitializing] = useState(true);
-  const [user, setUser] = useState(null);
+  // const [initializing, setInitializing] = useState(true);
+  const [user, setUser] = useState(true);
 
-  useEffect(() => {
-    const auth = getAuth();
-    const subscriber = onAuthStateChanged(auth, async (user) => {
-      setUser(user);
-      if (initializing) setInitializing(false);
-    });
+  // useEffect(() => {
+  //   const auth = getAuth();
+  //   const subscriber = onAuthStateChanged(auth, async (user) => {
+  //     setUser(user);
+  //     if (initializing) setInitializing(false);
+  //   });
 
-    // Cleanup function
-    return () => {
-      subscriber(); // Unsubscribe from onAuthStateChanged
-    };
-  }, [initializing]);
+  //   // Cleanup function
+  //   return () => {
+  //     subscriber(); // Unsubscribe from onAuthStateChanged
+  //   };
+  // }, [initializing]);
 
-  if (initializing) return null;
+  // if (initializing) return null;
 
   return (
     <Stack.Navigator
@@ -81,61 +81,61 @@ export default function OnboardingStack(props) {
 }
 
 function AppStack(props) {
-  const [initializing, setInitializing] = useState(true);
-  const [user, setUser] = useState(null);
-  const [hasMeasurementsForToday, setHasMeasurementsForToday] = useState(false);
-  const [userDocData, setUserDocData] = useState(null); // State for userDocData
+  // const [initializing, setInitializing] = useState(true);
+  // const [user, setUser] = useState(null);
+  const [hasMeasurementsForToday, setHasMeasurementsForToday] = useState(true);
+  // const [userDocData, setUserDocData] = useState(null); // State for userDocData
 
-  useEffect(() => {
-    const auth = getAuth();
-    const subscriber = onAuthStateChanged(auth, async (user) => {
-      setUser(user);
-      if (user) {
-        const userData = await fetchAdditionalUserData(user.uid, onDataSaved);
-        const userDocKey = new Date().toISOString().slice(0, 10);
-        if (userData && userData[userDocKey]) {
-          setHasMeasurementsForToday(true);
-        }
-      }
-      if (initializing) setInitializing(false);
-    });
+  // useEffect(() => {
+  //   const auth = getAuth();
+  //   const subscriber = onAuthStateChanged(auth, async (user) => {
+  //     setUser(user);
+  //     if (user) {
+  //       const userData = await fetchAdditionalUserData(user.uid, onDataSaved);
+  //       const userDocKey = new Date().toISOString().slice(0, 10);
+  //       if (userData && userData[userDocKey]) {
+  //         setHasMeasurementsForToday(true);
+  //       }
+  //     }
+  //     if (initializing) setInitializing(false);
+  //   });
 
-    // Cleanup function
-    return () => {
-      subscriber(); // Unsubscribe from onAuthStateChanged
-      // Additional cleanup for other listeners if needed
-    };
-  }, [initializing]);
+  //   // Cleanup function
+  //   return () => {
+  //     subscriber(); // Unsubscribe from onAuthStateChanged
+  //     // Additional cleanup for other listeners if needed
+  //   };
+  // }, [initializing]);
 
-  // Function to handle data saved event
-  const onDataSaved = () => {
-    setHasMeasurementsForToday(true);
-  };
+  // // Function to handle data saved event
+  // const onDataSaved = () => {
+  //   setHasMeasurementsForToday(true);
+  // };
 
-  // Listen for real-time updates on the user's document
-  useEffect(() => {
-    if (user) {
-      const userDocKey = new Date().toISOString().slice(0, 10);
-      const unsubscribe = onSnapshot(
-        collection(db, "additionalData2", user.uid, "dataEntries"),
-        (querySnapshot) => {
-          querySnapshot.forEach((doc) => {
-            if (doc.exists()) {
-              // Check if the document ID matches the current date
-              if (doc.id === userDocKey) {
-                setUserDocData(doc.data()); // Update userDocData state
-              }
-            }
-          });
-        }
-      );
+  // // Listen for real-time updates on the user's document
+  // useEffect(() => {
+  //   if (user) {
+  //     const userDocKey = new Date().toISOString().slice(0, 10);
+  //     const unsubscribe = onSnapshot(
+  //       collection(db, "additionalData2", user.uid, "dataEntries"),
+  //       (querySnapshot) => {
+  //         querySnapshot.forEach((doc) => {
+  //           if (doc.exists()) {
+  //             // Check if the document ID matches the current date
+  //             if (doc.id === userDocKey) {
+  //               setUserDocData(doc.data()); // Update userDocData state
+  //             }
+  //           }
+  //         });
+  //       }
+  //     );
 
-      // Cleanup function
-      return () => unsubscribe();
-    }
-  }, [user]);
+  //     // Cleanup function
+  //     return () => unsubscribe();
+  //   }
+  // }, [user]);
 
-  if (initializing) return null;
+  // if (initializing) return null;
 
   // Redirect to UserMeasurements if userDocData is null
   if (!hasMeasurementsForToday) {

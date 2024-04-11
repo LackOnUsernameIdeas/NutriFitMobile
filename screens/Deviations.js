@@ -1,9 +1,9 @@
 import React from "react";
 import { StyleSheet, View } from "react-native";
 import { Text } from "galio-framework";
-import { getAuth } from "firebase/auth";
+// import { getAuth } from "firebase/auth";
 import { Card } from "../components";
-import { saveDeviations } from "../database/setFunctions";
+// import { saveDeviations } from "../database/setFunctions";
 
 class Deviations extends React.Component {
   constructor(props) {
@@ -11,8 +11,8 @@ class Deviations extends React.Component {
   }
 
   async componentDidMount() {
-    const { mealPlan, userPreferences, isPlanGeneratedWithOpenAI } = this.props;
-
+    //const { mealPlan, userPreferences, isPlanGeneratedWithOpenAI } = this.props;
+    const { mealPlan, userPreferences } = this.props;
     // Calculate totals
     const calculatedTotals = this.calculateMealTotals(mealPlan);
 
@@ -63,12 +63,12 @@ class Deviations extends React.Component {
 
     // Save deviations
     try {
-      const uid = getAuth().currentUser.uid;
-      await saveDeviations(
-        uid,
-        isPlanGeneratedWithOpenAI ? "mealPlanOpenAI" : "mealPlanGemini",
-        deviationsSavable
-      );
+      // const uid = getAuth().currentUser.uid;
+      // await saveDeviations(
+      //   uid,
+      //   isPlanGeneratedWithOpenAI ? "mealPlanOpenAI" : "mealPlanGemini",
+      //   deviationsSavable
+      // );
       console.log("Deviations saved successfully.");
     } catch (error) {
       console.error("Error saving deviations:", error);

@@ -10,7 +10,7 @@ import {
 import { Block, Text } from "galio-framework";
 import { Button, Icon, Input } from "../components";
 import { Images, nutriTheme } from "../constants";
-import { getAuth, signInWithEmailAndPassword } from "firebase/auth";
+// import { getAuth, signInWithEmailAndPassword } from "firebase/auth";
 
 const { width, height } = Dimensions.get("screen");
 
@@ -25,43 +25,47 @@ class LogIn extends React.Component {
   }
 
   handleSignIn = () => {
-    const { email, password } = this.state;
-    const auth = getAuth();
-    signInWithEmailAndPassword(auth, email, password)
-      .then(() => {
-        // Handle successful sign-in
-        console.log("User signed in successfully!");
-        this.props.navigation.navigate("UserMeasurements");
-      })
-      .catch((error) => {
-        // Handle sign-in errors
-        let errorMessage;
-        switch (error.code) {
-          case "auth/invalid-email":
-            errorMessage = "Невалиден email. Проверете го и опитайте отново.";
-            break;
-          case "auth/user-not-found":
-            errorMessage = "Потребителят не е намерен. Регистрирайте се първо.";
-            break;
-          case "auth/wrong-password":
-            errorMessage = "Грешна парола. Опитайте отново.";
-            break;
-          case "auth/missing-email":
-            errorMessage = "Моля, въведете вашето имейл адрес.";
-            break;
-          case "auth/missing-password":
-            errorMessage = "Моля, въведете вашата парола.";
-            break;
-          case "auth/invalid-credential":
-            errorMessage = "Не сте въвели правилни данни. Опитайте отново.";
-            break;
-          default:
-            errorMessage = "Грешка: " + error.message;
-        }
-        this.setState({ errorMessage });
-        console.error("Error signing in:", error);
-      });
+    this.props.navigation.navigate("UserMeasurements");
   };
+
+  // handleSignIn = () => {
+  //   const { email, password } = this.state;
+  //   const auth = getAuth();
+  //   signInWithEmailAndPassword(auth, email, password)
+  //     .then(() => {
+  //       // Handle successful sign-in
+  //       console.log("User signed in successfully!");
+  //       this.props.navigation.navigate("UserMeasurements");
+  //     })
+  //     .catch((error) => {
+  //       // Handle sign-in errors
+  //       let errorMessage;
+  //       switch (error.code) {
+  //         case "auth/invalid-email":
+  //           errorMessage = "Невалиден email. Проверете го и опитайте отново.";
+  //           break;
+  //         case "auth/user-not-found":
+  //           errorMessage = "Потребителят не е намерен. Регистрирайте се първо.";
+  //           break;
+  //         case "auth/wrong-password":
+  //           errorMessage = "Грешна парола. Опитайте отново.";
+  //           break;
+  //         case "auth/missing-email":
+  //           errorMessage = "Моля, въведете вашето имейл адрес.";
+  //           break;
+  //         case "auth/missing-password":
+  //           errorMessage = "Моля, въведете вашата парола.";
+  //           break;
+  //         case "auth/invalid-credential":
+  //           errorMessage = "Не сте въвели правилни данни. Опитайте отново.";
+  //           break;
+  //         default:
+  //           errorMessage = "Грешка: " + error.message;
+  //       }
+  //       this.setState({ errorMessage });
+  //       console.error("Error signing in:", error);
+  //     });
+  // };
 
   render() {
     const { navigation } = this.props; // Assuming you're using React Navigation

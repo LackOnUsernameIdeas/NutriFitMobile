@@ -11,8 +11,8 @@ import {
 import { Block, Text } from "galio-framework";
 import { Button, Icon, Input } from "../components";
 import { Images, nutriTheme } from "../constants";
-import { fetchAdditionalUserData } from "../database/getFunctions";
-import { getAuth, signOut } from "firebase/auth";
+// import { fetchAdditionalUserData } from "../database/getFunctions";
+// import { getAuth, signOut } from "firebase/auth";
 
 const { width, height } = Dimensions.get("screen");
 
@@ -37,15 +37,16 @@ class UserMeasurements extends React.Component {
   }
 
   fetchGender = async () => {
-    const userData = await fetchAdditionalUserData(getAuth().currentUser.uid);
-    if (userData) {
-      this.setState({ gender: userData.gender });
+    // const userData = await fetchAdditionalUserData(getAuth().currentUser.uid);
+    if (true) {
+      this.setState({ gender: "male" });
       console.log("genda ", this.state.gender);
     }
   };
 
   triggerFetchAndSaveAllData = async () => {
-    const uid = getAuth().currentUser.uid;
+    // const uid = getAuth().currentUser.uid;
+    const uid = "WIJWWdWeCwWIZtkqQdKBlOVRRwC3";
     const { height, age, weight, gender, neck, waist, hip } = this.state;
 
     try {
@@ -86,7 +87,8 @@ class UserMeasurements extends React.Component {
   };
 
   saveUserData = async () => {
-    const uid = getAuth().currentUser.uid;
+    // const uid = getAuth().currentUser.uid;
+    const uid = "WIJWWdWeCwWIZtkqQdKBlOVRRwC3";
     const { height, age, weight, neck, waist, hip } = this.state;
     try {
       const response = await fetch(
@@ -158,7 +160,7 @@ class UserMeasurements extends React.Component {
     const { height, age, weight, neck, waist, hip } = this.state;
 
     const userData = { height, age, weight, neck, waist, hip };
-    console.log("UID ", getAuth().currentUser.uid);
+    // console.log("UID ", getAuth().currentUser.uid);
     if (!this.validateUserData(userData)) {
       this.setState({
         errorMessage: "Моля, въведете валидни стойности за всички полета."
@@ -200,8 +202,8 @@ class UserMeasurements extends React.Component {
   handleBackButtonPress = async () => {
     const { navigation } = this.props;
     try {
-      const auth = getAuth();
-      await signOut(auth);
+      // const auth = getAuth();
+      // await signOut(auth);
       navigation.navigate("LogIn");
     } catch (error) {
       console.error("Error logging out:", error);

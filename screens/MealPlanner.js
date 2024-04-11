@@ -50,9 +50,10 @@ class MealPlanner extends React.Component {
       mealPlan: {},
       requestFailed: false,
       isLoading: false,
-      isDailyCaloryLoading: false, //set to true!!!!!!!!!
+      isDailyCaloryLoading: true, //set to true!!!!!!!!!
       currentPage: 0,
-      itemsPerPage: 5
+      itemsPerPage: 5,
+      maikaTi: false
     };
   }
 
@@ -80,9 +81,13 @@ class MealPlanner extends React.Component {
     //   prevState.currentUser !== this.state.currentUser &&
     //   this.state.currentUser
     // ) {
-    if (true) {
+    const maikaTi = this.state.maikaTi;
+    if (maikaTi === false) {
       // Ако условието е изпълнено, се извиква метод за зареждане на данни.
       this.fetchData();
+      this.setState({
+        maikaTi: true
+      });
     }
 
     // if (prevState.userPreferences !== this.state.userPreferences) {
@@ -130,7 +135,7 @@ class MealPlanner extends React.Component {
       const uid = "WIJWWdWeCwWIZtkqQdKBlOVRRwC3";
       // Генериране на текущата дата във формат ISO и извличане на само датата.
       // const date = new Date().toISOString().slice(0, 10);
-      const date = "09-04-2024";
+      const date = "2024-04-09";
       // Изпращане на POST заявка към NutriFit API със зададени хедъри и body на заявката.
       console.log("fetching!");
       const response = await fetch(

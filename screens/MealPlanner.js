@@ -11,7 +11,7 @@ import { Block, Text } from "galio-framework";
 //import { EXPO_PUBLIC_OPENAI_API_KEY } from "@env";
 import { EXPO_PUBLIC_OPENAI_API_KEY } from "@env";
 import RecipeWidget from "../components/RecipeWidget";
-import { getAuth } from "firebase/auth";
+// import { getAuth } from "firebase/auth";
 import DailyCalorieRequirements from "./DailyCalorieRequirements";
 import { Card } from "../components";
 import { nutriTheme } from "../constants";
@@ -50,69 +50,70 @@ class MealPlanner extends React.Component {
       mealPlan: {},
       requestFailed: false,
       isLoading: false,
-      isDailyCaloryLoading: true,
+      isDailyCaloryLoading: false, //set to true!!!!!!!!!
       currentPage: 0,
       itemsPerPage: 5
     };
   }
 
-  // Извиква се при първоначално зареждане на компонента.
-  componentDidMount() {
-    // Извлича се аутентикационния обект.
-    const auth = getAuth();
-    // Създава се проследимост към промените на аутентикационния статус на потребителя.
-    this.unsubscribe = auth.onAuthStateChanged((user) => {
-      // Проверява дали има активен потребител.
-      if (user) {
-        // Актуализира се състоянието с текущия потребител.
-        this.setState({ currentUser: user });
-      } else {
-        // В случай на липса на потребител, състоянието се актуализира до нулево.
-        this.setState({ currentUser: null });
-      }
-    });
-  }
+  // // Извиква се при първоначално зареждане на компонента.
+  // componentDidMount() {
+  //   // Извлича се аутентикационния обект.
+  //   const auth = getAuth();
+  //   // Създава се проследимост към промените на аутентикационния статус на потребителя.
+  //   this.unsubscribe = auth.onAuthStateChanged((user) => {
+  //     // Проверява дали има активен потребител.
+  //     if (user) {
+  //       // Актуализира се състоянието с текущия потребител.
+  //       this.setState({ currentUser: user });
+  //     } else {
+  //       // В случай на липса на потребител, състоянието се актуализира до нулево.
+  //       this.setState({ currentUser: null });
+  //     }
+  //   });
+  // }
 
   // // Извиква се след всяко обновяване на компонента.
-  // componentDidUpdate(prevProps, prevState) {
-  //   // Проверява дали предишното състояние на текущия потребител се различава от текущото и дали има активен потребител.
-  //   if (
-  //     prevState.currentUser !== this.state.currentUser &&
-  //     this.state.currentUser
-  //   ) {
-  //     // Ако условието е изпълнено, се извиква метод за зареждане на данни.
-  //     this.fetchData();
-  //   }
+  componentDidUpdate(prevProps, prevState) {
+    // Проверява дали предишното състояние на текущия потребител се различава от текущото и дали има активен потребител.
+    // if (
+    //   prevState.currentUser !== this.state.currentUser &&
+    //   this.state.currentUser
+    // ) {
+    if (true) {
+      // Ако условието е изпълнено, се извиква метод за зареждане на данни.
+      this.fetchData();
+    }
 
-  //   if (prevState.userPreferences !== this.state.userPreferences) {
-  //     savePreferences(
-  //       this.state.currentUser.uid,
-  //       Number(this.state.userPreferences.Calories),
-  //       {
-  //         name: this.state.userPreferences.Diet,
-  //         protein: this.state.userPreferences.Protein,
-  //         fat: this.state.userPreferences.Fat,
-  //         carbs: this.state.userPreferences.Carbohydrates
-  //       }
-  //     );
-  //   }
+    // if (prevState.userPreferences !== this.state.userPreferences) {
+    //   savePreferences(
+    //     this.state.currentUser.uid,
+    //     Number(this.state.userPreferences.Calories),
+    //     {
+    //       name: this.state.userPreferences.Diet,
+    //       protein: this.state.userPreferences.Protein,
+    //       fat: this.state.userPreferences.Fat,
+    //       carbs: this.state.userPreferences.Carbohydrates
+    //     }
+    //   );
+    // }
 
-  //   if (
-  //     prevState.mealPlan !== this.state.mealPlan &&
-  //     prevState.mealPlanImages !== this.state.mealPlanImages
-  //   ) {
-  //     const aiUsed = this.state.isPlanGeneratedWithOpenAI
-  //       ? "mealPlanOpenAI"
-  //       : "mealPlanGemini";
+    // if (
+    //   prevState.mealPlan !== this.state.mealPlan &&
+    //   prevState.mealPlanImages !== this.state.mealPlanImages
+    // ) {
+    //   const aiUsed = this.state.isPlanGeneratedWithOpenAI
+    //     ? "mealPlanOpenAI"
+    //     : "mealPlanGemini";
 
-  //     saveMealPlan(
-  //       this.state.currentUser.uid,
-  //       aiUsed,
-  //       this.state.mealPlan,
-  //       this.state.mealPlanImages
-  //     );
-  //   }
-  // }
+    //   saveMealPlan(
+    //     this.state.currentUser.uid,
+    //     aiUsed,
+    //     this.state.mealPlan,
+    //     this.state.mealPlanImages
+    //   );
+    // }
+  }
 
   // Извиква се преди изтриване на компонента.
   componentWillUnmount() {
@@ -126,10 +127,12 @@ class MealPlanner extends React.Component {
   fetchData = async () => {
     try {
       // Извличане на уникалния идентификационен номер на текущия потребител.
-      const uid = this.state.currentUser.uid;
+      const uid = "WIJWWdWeCwWIZtkqQdKBlOVRRwC3";
       // Генериране на текущата дата във формат ISO и извличане на само датата.
-      const date = new Date().toISOString().slice(0, 10);
+      // const date = new Date().toISOString().slice(0, 10);
+      const date = "09-04-2024";
       // Изпращане на POST заявка към NutriFit API със зададени хедъри и body на заявката.
+      console.log("fetching!");
       const response = await fetch(
         "https://nutri-api.noit.eu/weightStatsAndMealPlanner",
         {
@@ -150,7 +153,7 @@ class MealPlanner extends React.Component {
         // В случай на неуспешна заявка, генерира се грешка.
         throw new Error("Failed to fetch weight stats");
       }
-
+      console.log("fetched now!");
       // Извличане на данните от отговора в JSON формат.
       const weightStatsData = await response.json();
 

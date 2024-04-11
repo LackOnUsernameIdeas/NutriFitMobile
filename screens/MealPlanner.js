@@ -58,21 +58,22 @@ class MealPlanner extends React.Component {
   }
 
   // // Извиква се при първоначално зареждане на компонента.
-  // componentDidMount() {
-  //   // Извлича се аутентикационния обект.
-  //   const auth = getAuth();
-  //   // Създава се проследимост към промените на аутентикационния статус на потребителя.
-  //   this.unsubscribe = auth.onAuthStateChanged((user) => {
-  //     // Проверява дали има активен потребител.
-  //     if (user) {
-  //       // Актуализира се състоянието с текущия потребител.
-  //       this.setState({ currentUser: user });
-  //     } else {
-  //       // В случай на липса на потребител, състоянието се актуализира до нулево.
-  //       this.setState({ currentUser: null });
-  //     }
-  //   });
-  // }
+  componentDidMount() {
+    // // Извлича се аутентикационния обект.
+    // const auth = getAuth();
+    // // Създава се проследимост към промените на аутентикационния статус на потребителя.
+    // this.unsubscribe = auth.onAuthStateChanged((user) => {
+    //   // Проверява дали има активен потребител.
+    //   if (user) {
+    //     // Актуализира се състоянието с текущия потребител.
+    //     this.setState({ currentUser: user });
+    //   } else {
+    //     // В случай на липса на потребител, състоянието се актуализира до нулево.
+    //     this.setState({ currentUser: null });
+    //   }
+    // });
+    console.log("hi");
+  }
 
   // // Извиква се след всяко обновяване на компонента.
   componentDidUpdate(prevProps, prevState) {
@@ -122,8 +123,9 @@ class MealPlanner extends React.Component {
 
   // Извиква се преди изтриване на компонента.
   componentWillUnmount() {
-    // Прекъсва проследяването на промените в аутентикационния статус на потребителя.
-    this.unsubscribe();
+    // // Прекъсва проследяването на промените в аутентикационния статус на потребителя.
+    // this.unsubscribe();
+    console.log("bye");
   }
 
   /**

@@ -11,10 +11,12 @@ import { NavigationContainer } from "@react-navigation/native";
 // Before rendering any navigation stack
 import { enableScreens } from "react-native-screens";
 enableScreens();
-
 import Screens from "./navigation/Screens";
 import { Images, nutriTheme } from "./constants";
+import { initializeApp } from "firebase/app";
+import { firebaseConfig } from "./database/connection";
 
+export const app = initializeApp(firebaseConfig);
 // cache app images
 const assetImages = [
   Images.Onboarding,

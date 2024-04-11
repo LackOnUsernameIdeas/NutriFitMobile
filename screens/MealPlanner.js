@@ -53,7 +53,7 @@ class MealPlanner extends React.Component {
       isDailyCaloryLoading: true, //set to true!!!!!!!!!
       currentPage: 0,
       itemsPerPage: 5,
-      maikaTi: false
+      onDailyCaloryMount: false
     };
   }
 
@@ -82,12 +82,12 @@ class MealPlanner extends React.Component {
     //   prevState.currentUser !== this.state.currentUser &&
     //   this.state.currentUser
     // ) {
-    const maikaTi = this.state.maikaTi;
-    if (maikaTi === false) {
+    const onDailyCaloryMount = this.state.onDailyCaloryMount;
+    if (onDailyCaloryMount === false) {
       // Ако условието е изпълнено, се извиква метод за зареждане на данни.
       this.fetchData();
       this.setState({
-        maikaTi: true
+        onDailyCaloryMount: true
       });
     }
 

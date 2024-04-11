@@ -8,8 +8,6 @@ import {
   ActivityIndicator
 } from "react-native";
 import { Block, Text } from "galio-framework";
-//import { EXPO_PUBLIC_OPENAI_API_KEY } from "@env";
-import { EXPO_PUBLIC_OPENAI_API_KEY } from "@env";
 import RecipeWidget from "../components/RecipeWidget";
 import { getAuth } from "firebase/auth";
 import DailyCalorieRequirements from "./DailyCalorieRequirements";
@@ -446,6 +444,8 @@ class MealPlanner extends React.Component {
           isLoading: true
         });
         console.log("fetching openai");
+        // Key
+        const secret = process.env.SECRET_OPEN;
         // Изпраща заявка към OpenAI API за генериране на план за хранене.
         const response = await fetch(
           "https://api.openai.com/v1/chat/completions",
@@ -453,7 +453,7 @@ class MealPlanner extends React.Component {
             method: "POST",
             headers: {
               "Content-Type": "application/json",
-              Authorization: `Bearer ${EXPO_PUBLIC_OPENAI_API_KEY}`
+              Authorization: `Bearer ${secret}`
             },
             body: JSON.stringify({
               model: "gpt-4-0125-preview",

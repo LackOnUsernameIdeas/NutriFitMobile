@@ -1,12 +1,26 @@
 import React from "react";
-import { Image, StyleSheet } from "react-native";
+import { Image, StyleSheet, Alert, TouchableOpacity, View } from "react-native"; // Import Alert from react-native
 import { Block, Text, theme } from "galio-framework";
 import PropTypes from "prop-types";
 import { nutriTheme } from "../constants";
+import CustomAlert from "./Modal";
 
 class RecipeWidget extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      showAlert: false
+    };
+  }
+
+  handleIngredientsPress = () => {
+    const { item } = this.props;
+    this.setState({ showAlert: true });
+  };
+
   render() {
     const { image, item, style, imageStyle } = this.props;
+    const { showAlert } = this.state;
 
     if (!image) {
       return null;
@@ -36,10 +50,10 @@ class RecipeWidget extends React.Component {
                 gap: 33
               }}
             >
-              <Text size={12} color={nutriTheme.COLORS.ACTIVE} bold>
+              <Text size={12} color={"#8c8bfc"} bold>
                 {`Калории: ${item.totals.calories} `}
               </Text>
-              <Text size={12} color={nutriTheme.COLORS.ACTIVE} bold>
+              <Text size={12} color={"#8c8bfc"} bold>
                 {`Протеин: ${item.totals.protein}г.`}
               </Text>
             </Block>
@@ -50,14 +64,27 @@ class RecipeWidget extends React.Component {
                 gap: 30
               }}
             >
-              <Text size={12} color={nutriTheme.COLORS.ACTIVE} bold>
+              <Text size={12} color={"#8c8bfc"} bold>
                 {`Мазнини: ${item.totals.fat}г. `}
               </Text>
-              <Text size={12} color={nutriTheme.COLORS.ACTIVE} bold>
+              <Text size={12} color={"#8c8bfc"} bold>
                 {`Въглехидрати: ${item.totals.carbohydrates}г.`}
               </Text>
             </Block>
           </Block>
+          <TouchableOpacity onPress={this.handleIngredientsPress}>
+            <View style={styles.button}>
+              <Text style={styles.buttonText}>Покажи рецепта</Text>
+            </View>
+          </TouchableOpacity>
+          <CustomAlert
+            visible={showAlert}
+            onClose={() => this.setState({ showAlert: false })}
+            title="Рецепта"
+            ingredients={item.ingredients.join(", ")}
+            instructions={item.instructions}
+            grams={item.recipeQuantity}
+          />
         </Block>
       </Block>
     );
@@ -107,6 +134,20 @@ const styles = StyleSheet.create({
     flex: 1,
     flexWrap: "wrap",
     paddingBottom: 6
+  },
+  button: {
+    backgroundColor: "#8c8bfc",
+    borderRadius: 10,
+    paddingVertical: 10,
+    paddingHorizontal: 50,
+    marginTop: 15,
+    alignItems: "center",
+    justifyContent: "center"
+  },
+  buttonText: {
+    color: theme.COLORS.WHITE,
+    fontSize: 16,
+    fontWeight: "bold"
   }
 });
 

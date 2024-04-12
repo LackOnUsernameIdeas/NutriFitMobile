@@ -4,7 +4,7 @@
   "description": "Track your bodily change and create meal plans with the power of AI using NutriFit!",
   "main": "node_modules/expo/AppEntry.js",
   "scripts": {
-    "start": "expo start",
+    "start": "expo start --tunnel",
     "android": "expo start --android",
     "ios": "expo start --ios",
     "eject": "expo eject"

@@ -62,27 +62,23 @@
     "typescript": "^4.9.4"
   },
   "keywords": [
-    "argon react native",
-    "argon design system",
-    "argon app react native",
-    "argon iOS",
+    "react native",
+    "design system",
+    "app react native",
+    "iOS",
     "react native iOS",
     "creative tim",
-    "argon Android",
+    "Android",
     "react native ui kit",
     "react native expo",
     "freebie",
-    "react native argon design",
+    "react native design",
     "react native galio",
-    "galio argon free",
+    "galio free",
     "galio react native free app",
-    "argon expo react native",
+    "expo react native",
     "react native ui template"
   ],
   "author": "Creative Tim <hello@creative-tim.com> (https://www.creative-tim.com/)",
-  "license": "MIT",
-  "bugs": {
-    "url": "https://github.com/creativetimofficial/argon-react-native/issues"
-  },
-  "homepage": "https://demos.creative-tim.com/argon-react-native"
+  "license": "MIT"
 }

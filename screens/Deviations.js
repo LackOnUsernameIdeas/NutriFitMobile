@@ -69,7 +69,6 @@ class Deviations extends React.Component {
         isPlanGeneratedWithOpenAI ? "mealPlanOpenAI" : "mealPlanGemini",
         deviationsSavable
       );
-      console.log("Deviations saved successfully.");
     } catch (error) {
       console.error("Error saving deviations:", error);
     }
@@ -89,7 +88,6 @@ class Deviations extends React.Component {
       if (mealType !== "totals") {
         // Iterate over each food item in the meal type
         Object.values(meal).forEach((foodItem) => {
-          console.log("foodItem", foodItem);
           // Check if foodItem has totals property
           if (foodItem && foodItem.totals) {
             // Add the nutrients of the food item to the totals for the day

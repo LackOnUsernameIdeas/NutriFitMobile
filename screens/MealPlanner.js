@@ -292,8 +292,6 @@ class MealPlanner extends React.Component {
   };
 
   render() {
-    console.log("userPreferences: ", this.state.userPreferences);
-
     // Обект, който съдържа преводите на кухните от английски на български.
     const cuisineTranslation = {
       Italian: "Италианска",
@@ -330,7 +328,6 @@ class MealPlanner extends React.Component {
     } else {
       promptCuisine = translatedCuisine;
     }
-    console.log("TRANSLATED --->", promptCuisine);
     let cuisinePhrase;
 
     // Генериране на фразата за предпочитаната кухня на потребителя.
@@ -345,7 +342,6 @@ class MealPlanner extends React.Component {
     } else {
       cuisinePhrase = this.state.userPreferences.Cuisine;
     }
-    console.log("cuisinePhrase --->", cuisinePhrase);
 
     // промпт за OpenAI и Gemini.
     const prompt = `Вие сте опитен диетолог, който наблюдава пациентите да консумират само ядлива и традиционна храна от
@@ -444,7 +440,6 @@ class MealPlanner extends React.Component {
           requestFailed: false,
           isLoading: true
         });
-        console.log("fetching openai");
         // Key
         const secret = process.env.SECRET_OPEN;
         // Изпраща заявка към OpenAI API за генериране на план за хранене.
@@ -475,21 +470,17 @@ class MealPlanner extends React.Component {
           });
           throw new Error("Failed to generate meal plan");
         }
-        console.log("res: ", response);
         const responseData = await response.json();
         const responseJson = responseData.choices[0].message.content;
         // Декодира и обработва отговора от OpenAI API.
         const unescapedData = responseJson;
         const escapedData = decodeURIComponent(unescapedData);
-        console.log("escapedData: ", escapedData);
 
         const data = JSON.parse(escapedData);
 
         if (!isValidJson(data)) {
           throw new Error("Invalid JSON structure");
         }
-
-        console.log("OPENAI: ", data);
 
         // Филтрира обекта с данни за плана за хранене, като премахва стойностите за общи стойности (totals).
         const filteredArr = Object.fromEntries(
@@ -580,8 +571,6 @@ class MealPlanner extends React.Component {
           }
         }
 
-        console.log("mealPlanImagesData:", mealPlanImagesData);
-
         // Актуализира състоянието с връзките към изображенията на ястията и плана за хранене, които са били генерирани с OpenAI модела.
         this.setState({
           mealPlanImages: mealPlanImagesData,
@@ -610,8 +599,6 @@ class MealPlanner extends React.Component {
           requestFailed: false,
           isLoading: true
         });
-        console.log("PROMPT --->", prompt);
-        console.log("fetching gemini");
         // Изпраща заявка към NutriFit API за генериране на план за хранене с Gemini модела.
         const response = await fetch(
           "https://nutri-api.noit.eu/geminiGenerateResponse",
@@ -627,7 +614,6 @@ class MealPlanner extends React.Component {
 
         const responseData = await response.json();
         const responseJson = responseData.aiResponse;
-        console.log("Response from backend:", responseJson);
 
         const stringToRepair = responseJson
           .replace(/^```json([\s\S]*?)```$/, "$1")
@@ -636,10 +622,8 @@ class MealPlanner extends React.Component {
           .trim();
         let jsonObject;
         try {
-          console.log("stringToRepair: ", stringToRepair);
           jsonObject = JSON.parse(stringToRepair);
           checkTotals(jsonObject);
-          console.log("jsonObject11111: ", jsonObject);
         } catch (parseError) {
           throw new Error("Invalid JSON response from the server");
         }
@@ -648,7 +632,6 @@ class MealPlanner extends React.Component {
           throw new Error("Invalid JSON structure");
         }
 
-        console.log("jsonObject: ", jsonObject);
         // Обект, който ще съдържа връзките към изображенията на ястията от плана за хранене, генериран с Gemini модела.
         const mealPlanImagesData = {
           breakfast: {
@@ -711,8 +694,6 @@ class MealPlanner extends React.Component {
             const imageMainResponseData = await imageMain.json();
             const imageDessertResponseData =
               imageDessert !== null ? await imageDessert.json() : null;
-
-            // console.log("imageDessert: ", imageDessert, mealKey);
 
             if (
               imageAppetizerResponseData !== null &&
@@ -803,8 +784,6 @@ class MealPlanner extends React.Component {
     } = this.state;
 
     const levels = [1, 2, 3, 4, 5, 6];
-
-    console.log("activityLevel: ", activityLevel);
 
     const startIndex = currentPage * itemsPerPage;
     const endIndex = startIndex + itemsPerPage;

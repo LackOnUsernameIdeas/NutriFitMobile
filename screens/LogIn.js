@@ -30,7 +30,6 @@ class LogIn extends React.Component {
     signInWithEmailAndPassword(auth, email, password)
       .then(() => {
         // Handle successful sign-in
-        console.log("User signed in successfully!");
         this.props.navigation.navigate("UserMeasurements");
       })
       .catch((error) => {

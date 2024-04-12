@@ -40,7 +40,6 @@ class UserMeasurements extends React.Component {
     const userData = await fetchAdditionalUserData(getAuth().currentUser.uid);
     if (userData) {
       this.setState({ gender: userData.gender });
-      console.log("genda ", this.state.gender);
     }
   };
 
@@ -79,7 +78,6 @@ class UserMeasurements extends React.Component {
       );
 
       const result = await response.json();
-      console.log("Server response:", result);
     } catch (error) {
       console.error("Error triggering fetch and save:", error);
     }
@@ -109,7 +107,6 @@ class UserMeasurements extends React.Component {
       );
 
       const result = await response.json();
-      console.log("Server response SAVING:", result);
       return result;
     } catch (error) {
       console.error("Error triggering fetch and save:", error);
@@ -158,7 +155,6 @@ class UserMeasurements extends React.Component {
     const { height, age, weight, neck, waist, hip } = this.state;
 
     const userData = { height, age, weight, neck, waist, hip };
-    console.log("UID ", getAuth().currentUser.uid);
     if (!this.validateUserData(userData)) {
       this.setState({
         errorMessage: "Моля, въведете валидни стойности за всички полета."
@@ -185,7 +181,6 @@ class UserMeasurements extends React.Component {
 
       if (response.ok) {
         const responseData = await response.json();
-        console.log("Server response:", responseData);
         this.setState({ errorMessage: null });
       } else {
         console.error("Server error:", response.statusText);

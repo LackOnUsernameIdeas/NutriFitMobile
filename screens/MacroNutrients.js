@@ -1,6 +1,7 @@
 import React, { Component } from "react";
 import { Text, StyleSheet, View, Pressable } from "react-native";
-import InfoBox from "../components/InfoBox";
+import InfoBox from "../components/InfoBoxLevels";
+import InfoBoxMacroNutrients from "../components/InfoBoxMacroNutrients";
 
 class MacroNutrients extends Component {
   constructor(props) {
@@ -71,16 +72,7 @@ class MacroNutrients extends Component {
       <View style={styles.container}>
         <View style={styles.rowContainer}>
           <Text style={styles.header}>Изберете тип диета:</Text>
-          <InfoBox
-            title="Нива на натовареност"
-            text={[
-              "<b>Балансирана:</b><br /> Балансирано разпределение на макронутриенти с умерени нива на протеини, въглехидрати и мазнини. Идеална за поддържане на здравето.",
-              "<b>Ниско съдържание на мазнини:</b><br /> Набляга на намаляване на приема на мазнини и поддържане на адекватни нива на протеини и въглехидрати. Подходящ за тези, които се стремят да намалят общия прием на калории и да контролират теглото си.",
-              "<b>Ниско съдържание на въглехидрати:</b><br /> Фокусира се върху минимизиране на приема на въглехидрати, като същевременно осигурява достатъчно протеини и здравословни мазнини.",
-              "<b>Високо съдържание на протеин:</b><br /> Дава приоритет на по-висок прием на протеин с умерени нива на въглехидрати и мазнини. Идеална за тези, които искат да подпомогнат развитието на мускулите, особено при силови тренировки или фитнес програми."
-            ]}
-            isForMacroNutrients
-          />
+          <InfoBoxMacroNutrients title="Видове диети" isForMacroNutrients />
         </View>
         <View style={styles.table}>
           {tableData.map((item, index) => (

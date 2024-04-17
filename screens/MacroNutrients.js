@@ -16,11 +16,14 @@ class MacroNutrients extends Component {
   handleDietClicked = (diet) => {
     this.setState({ selectedDiet: diet.name }); // Update selectedDiet in state
     this.props.onDietSelect(diet.protein, diet.fat, diet.carbs, diet.name);
-    this.showTooltip(diet.name);
+    this.showTooltip(diet);
   };
 
-  showTooltip = (name) => {
-    this.setState({ tooltipVisible: true, tooltipName: name });
+  showTooltip = (item) => {
+    this.setState({
+      tooltipVisible: true,
+      tooltipName: `${item.name} - протеин: ${item.protein}, мазнини: ${item.fat}, въглехидрати: ${item.carbs}`
+    });
   };
 
   hideTooltip = () => {
@@ -84,7 +87,7 @@ class MacroNutrients extends Component {
                 this.state.selectedDiet === item.name && styles.selectedRow // Apply selectedRow style when selectedDiet matches
               ]}
               onPress={() => this.handleDietClicked(item)}
-              onPressIn={() => this.showTooltip(item.name)}
+              onPressIn={() => this.showTooltip(item)}
               onPressOut={this.hideTooltip}
               delayLongPress={1000}
             >
@@ -135,8 +138,8 @@ const styles = StyleSheet.create({
     borderBottomColor: "black",
     paddingVertical: 10,
     paddingHorizontal: 5,
-    borderColor: "transparent", // Add this line
-    borderWidth: 2
+    borderColor: "black", // Add this line
+    borderWidth: 1
   },
   pressedRow: {
     opacity: 0.5
@@ -156,15 +159,17 @@ const styles = StyleSheet.create({
   tooltip: {
     position: "absolute",
     backgroundColor: "rgba(0, 0, 0, 0.7)",
-    padding: 10,
-    borderRadius: 5,
+    padding: 15,
+    borderRadius: 10,
     alignSelf: "center",
     top: "50%",
     zIndex: 999,
     elevation: 5
   },
   tooltipText: {
-    color: "#fff"
+    color: "#fff",
+    fontSize: 16,
+    fontWeight: "bold"
   }
 });
 

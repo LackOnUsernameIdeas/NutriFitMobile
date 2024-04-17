@@ -22,22 +22,31 @@ class RecipeWidget extends React.Component {
     const { image, item, style, imageStyle } = this.props;
     const { showAlert } = this.state;
 
-    if (!image) {
-      return null;
-    }
+    // if (!image) {
+    //   return null;
+    // }
 
     const imageStyles = [styles.fullImage, imageStyle];
     const cardContainer = [styles.card, styles.shadow, style];
     const imgContainer = [styles.imageContainer, styles.shadow];
 
+    let itemName = item.name;
+
+    // Check if the item name is "Crema Catalana"
+    if (item.name === "Crema Catalana") {
+      itemName = "Каталунски крем";
+    }
+
     return (
       <Block card flex style={cardContainer}>
-        <Block flex style={imgContainer}>
-          <Image source={{ uri: image }} style={imageStyles} />
-        </Block>
+        {image && (
+          <Block flex style={imgContainer}>
+            <Image source={{ uri: image }} style={imageStyles} />
+          </Block>
+        )}
         <Block flex space="between" style={styles.cardDescription}>
           <Text size={20} style={styles.cardTitle}>
-            {item.name}
+            {itemName}
           </Text>
           <Text size={15} style={styles.cardTitle} bold>
             {`Грамаж: ${item.totals.grams}г.`}

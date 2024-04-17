@@ -32,9 +32,20 @@ class RecipeWidget extends React.Component {
 
     let itemName = item.name;
 
-    // Check if the item name is "Crema Catalana"
-    if (item.name === "Crema Catalana") {
-      itemName = "Каталунски крем";
+    switch (item.name) {
+      case "Crema Catalana":
+      case "Crema catalana":
+        itemName = "Каталунски крем";
+        break;
+      case "Италиански тирамису":
+        itemName = "Италианско тирамису";
+        break;
+      case "Ягодов сорбет":
+        itemName = "Ягодово сорбе";
+        break;
+      default:
+        // If the item name doesn't match any of the cases above, keep the original name
+        break;
     }
 
     return (

@@ -343,8 +343,65 @@ class MealPlanner extends React.Component {
       cuisinePhrase = this.state.userPreferences.Cuisine;
     }
 
-    // промпт за OpenAI и Gemini.
     const prompt = `Вие сте опитен диетолог, който наблюдава пациентите да консумират само ядлива и традиционна храна от
+    ${cuisinePhrase} кухня/кухни (${promptCuisine}). Фокусирайте се върху създаването на ТОЧЕН, разнообразен и вкусен дневен хранителен план, съставен от следните ограничения: калории (${
+      this.state.userPreferences.Calories
+    }), протеин (${this.state.userPreferences.Protein}), мазнини (${
+      this.state.userPreferences.Fat
+    }) и въглехидрати (${
+      this.state.userPreferences.Carbohydrates
+    }). Никога не превишавайте или намалявайте предоставените лимити и се УВЕРЕТЕ, че калориите и мазнините ВИНАГИ са същите като предоставените лимити. 
+      Осигурете точността на количествата, като същевременно се придържате към лимитите. 
+      Уверете се, че предоставените от вас хранения се различават от тези, които сте предоставили в предишни заявки. Давай винаги нови и вкусни храни, така че винаги да се създаде уникално и разнообразно меню.
+      Експортирайте в JSON ТОЧНО КАТО ПРЕДОСТАВЕНАТА СТРУКТУРА в съдържанието на този заявка, без да добавяте 'json' ключова дума с обратни кавички. 
+      Отговорът трябва да бъде чист JSON, нищо друго. Това означава, че вашият отговор не трябва да започва с 'json*backticks*{data}*backticks*' или '*backticks*{data}*backticks*'.
+      Създайте ми дневно меню с ниско съдържание на мазнини, включващо едно ястие за закуска, три за обяд (третото трябва да е десерт) и две за вечеря (второто да бъде десерт). 
+      Менюто трябва стриктно да спазва следните лимити: да съдържа ${
+        this.state.userPreferences.Calories
+      } калории, ${this.state.userPreferences.Protein} грама протеин, ${
+      this.state.userPreferences.Fat
+    } грама мазнини и ${
+      this.state.userPreferences.Carbohydrates
+    } грама въглехидрати. 
+      НЕ Предоставяйте храни, които накрая имат значително по-малко количество калории, въглехидрати, протеин и мазнини в сравнение с посочените общи лимити (${
+        this.state.userPreferences.Calories
+      } калории, ${this.state.userPreferences.Protein} грама протеин, ${
+      this.state.userPreferences.Fat
+    } грама мазнини и ${
+      this.state.userPreferences.Carbohydrates
+    } грама въглехидрати) и НИКОГА, АБСОЛЮТНО НИКОГА не давай хранителен план, чийто сумирани стойности са с отклонение от лимитите на потребителя - 100 калории, 10 грама протеини, 20 грама въглехидрати, 10 грама мазнини. ДАВАЙ ВСЕКИ ПЪТ РАЗЛИЧНИ храни, а не еднакви или измислени рецепти.
+      Включвай само съществуващи в реалния свят храни в хранителния план. Предоставете точни мерки и точни стойности за калории, протеин, въглехидрати и мазнини за закуска, обяд, вечеря и общо. Включете само реалистични храни за консумация. 
+      Подсигури рецепти за приготвянето на храните и нужните продукти(съставки) към всяко едно ястие. Направи рецептите и съставките, така че да се получи накрая точното количество, което ще се яде, не повече от това.
+      Имената на храните трябва да бъдат адекватно преведени и написани на български език и да са реални ястия за консумация. 
+      ${
+        this.state.userPreferences.Exclude &&
+        `Добави всички останали условия към менюто, но се увери, че избягваш стриктно да включваш следните елементи в менюто на храните: ${this.state.userPreferences.Exclude}. 
+        Съобрази се с начина на приготвяне и рецептите вече като имаш в предвид какво НЕ ТРЯБВА да се включва.`
+      }
+      Имената на храните трябва да са адекватно преведени и написани, така че да са съществуващи храни. 
+      Форматирай общата информацията за калориите, протеина, въглехидратите и мазнините по следния начин И ВНИМАВАЙ ТЯ ДА НЕ Е РАЗЛИЧНА ОТ ОБЩАТА СТОЙНОСТ НА КАЛОРИИТЕ, ВЪГЛЕХИДРАТИТЕ, ПРОТЕИНА И МАЗНИНИТЕ НА ЯСТИЯТА: 'totals: {'calories': number,'protein': number,'fat': number,'carbohydrates': number,'grams':number}'. 
+      Форматирай ЦЯЛАТА информация във валиден JSON точно така: 
+      "'breakfast':{
+          'main':{'name':'string','totals':{'calories':number,'protein':number,'fat':number,'carbohydrates':number,'grams':number}, 'ingredients':['quantity ingredient','quantity ingredient','quantity ingredient','quantity ingredient','quantity ingredient'...], 'instructions':['1.string','2.string','3.string','4.string'...], 'recipeQuantity': number (in grams)}
+        },
+        'lunch':{
+          'appetizer':{'name':'string','totals':{'calories':number,'protein':number,'fat':number,'carbohydrates':number,'grams':number}, 'ingredients':['quantity ingredient','quantity ingredient','quantity ingredient','quantity ingredient','quantity ingredient'...], 'instructions':['1.string','2.string','3.string','4.string'...], 'recipeQuantity': number (in grams)}, 
+          'main':{'name':'string','totals':{'calories':number,'protein':number,'fat':number,'carbohydrates':number,'grams':number}, 'ingredients':['quantity ingredient','quantity ingredient','quantity ingredient','quantity ingredient','quantity ingredient'...], 'instructions':['1.string','2.string','3.string','4.string'...], 'recipeQuantity': number (in grams)}, 
+          'dessert':{'name':'string','totals':{'calories':number,'protein':number,'fat':number,'carbohydrates':number,'grams':number}, 'ingredients':['quantity ingredient','quantity ingredient','quantity ingredient','quantity ingredient','quantity ingredient'...], 'instructions':['1.string','2.string','3.string','4.string'...], 'recipeQuantity': number (in grams)}
+        }, 
+        'dinner':{
+          'main':{'name':'string','totals':{'calories':number,'protein':number,'fat':number,'carbohydrates':number,'grams':number}, 'ingredients':['quantity ingredient','quantity ingredient','quantity ingredient','quantity ingredient','quantity ingredient'...], 'instructions':['1.string','2.string','3.string','4.string'...], 'recipeQuantity': number (in grams)}, 
+          'dessert':{'name':'string','totals':{'calories':number,'protein':number,'fat':number,'carbohydrates':number,'grams':number}, 'ingredients':['quantity ingredient','quantity ingredient','quantity ingredient','quantity ingredient','quantity ingredient'...], 'instructions':['1.string','2.string','3.string','4.string'...], 'recipeQuantity': number (in grams)}
+        }", като не превеждаш имената на нито едно property (ТЕ ТРЯБВА ДА СА САМО НА АНГЛИЙСКИ ЕЗИК). 
+      Съобрази се с подадената структура когато връщаш твоя отговор и където пише number, НЕ връщай string! Не добавяй излишни кавички или думи, JSON формата трябва да е валиден. 
+  
+  
+      Преведи САМО стойностите на БЪЛГАРСКИ, без нито едно property. Те трябва ЗАДЪЛЖИТЕЛНО да са на английски. 
+      Грамажът на ястията е ЗАДЪЛЖИТЕЛНА стойност, която НЕ трябва да е повече от 500 грама. Не включвай грамажа в името на ястието, а го дай САМО като стойност в totals. 
+      Името на ястието трябва да е ЗАДЪЛЖИТЕЛНО на български, а не на искапнски или друг език.`;
+
+    // промпт за OpenAI и Gemini.
+    const promptGemini = `Вие сте опитен диетолог, който наблюдава пациентите да консумират само ядлива и традиционна храна от
     ${cuisinePhrase} кухня/кухни (${promptCuisine}). Фокусирайте се върху създаването на ТОЧЕН, разнообразен и вкусен дневен хранителен план, съставен от следните ограничения: калории (${
       this.state.userPreferences.Calories
     }), протеин (${this.state.userPreferences.Protein}), мазнини (${
@@ -406,22 +463,28 @@ class MealPlanner extends React.Component {
      * @param {Object|Object[]} obj - Обект или масив от обекти, които трябва да бъдат проверени.
      * @throws {Error} - Генерира се грешка, ако стойностите в обекта не са числа.
      */
-    checkTotals = (obj) => {
+    checkTotals = (obj, state) => {
       if (Array.isArray(obj)) {
-        obj.forEach((item) => checkTotals(item));
+        obj.forEach((item) => checkTotals(item, state));
       } else if (typeof obj === "object" && obj !== null) {
         if (obj.hasOwnProperty("totals")) {
+          // Check if "grams" exists inside "totals"
+          if (!obj.totals.hasOwnProperty("grams")) {
+            this.setState({
+              requestFailed: true
+            });
+          }
           for (let key in obj.totals) {
             if (typeof obj.totals[key] !== "number") {
-              throw new Error(
-                `Invalid value for ${key} in totals: Expected a number`
-              );
+              this.setState({
+                requestFailed: true
+              });
             }
           }
         }
-        // Рекурсивно проверява вложените обекти
+        // Recursively check nested objects
         for (let key in obj) {
-          checkTotals(obj[key]);
+          checkTotals(obj[key], state);
         }
       }
     };
@@ -522,13 +585,13 @@ class MealPlanner extends React.Component {
           async function fetchImage(name) {
             try {
               let response = await fetch(
-                `https://customsearch.googleapis.com/customsearch/v1?key=AIzaSyBGskRKof9dkcoXtReamm4-h7UorF1G7yM&cx=10030740e88c842af&q=${encodeURIComponent(
+                `https://customsearch.googleapis.com/customsearch/v1?key=AIzaSyBkQKjvwEUYdDYHX7u0PNYa_9MWEIOHzfk&cx=10030740e88c842af&q=${encodeURIComponent(
                   name
                 )}&searchType=image`
               );
               if (response.status === 429) {
                 let response = await fetch(
-                  `https://customsearch.googleapis.com/customsearch/v1?key=AIzaSyBpwC_IdPQ2u-16x_9QwoqJDu-zMhuFKxs&cx=258e213112b4b4492&q=${encodeURIComponent(
+                  `https://customsearch.googleapis.com/customsearch/v1?key=AIzaSyAUOQzjNbBnGSBVvCZkWqHX7uebGZRY0lg&cx=258e213112b4b4492&q=${encodeURIComponent(
                     name
                   )}&searchType=image`
                 );
@@ -617,7 +680,7 @@ class MealPlanner extends React.Component {
               "Content-Type": "application/json",
               "x-api-key": "349f35fa-fafc-41b9-89ed-ff19addc3494"
             },
-            body: JSON.stringify({ text: prompt })
+            body: JSON.stringify({ text: promptGemini })
           }
         );
 
@@ -674,13 +737,13 @@ class MealPlanner extends React.Component {
             async function fetchImage(name) {
               try {
                 let response = await fetch(
-                  `https://customsearch.googleapis.com/customsearch/v1?key=AIzaSyDqUez1TEmLSgZAvIaMkWfsq9rSm0kDjIw&cx=10030740e88c842af&q=${encodeURIComponent(
+                  `https://customsearch.googleapis.com/customsearch/v1?key=AIzaSyBkQKjvwEUYdDYHX7u0PNYa_9MWEIOHzfk&cx=10030740e88c842af&q=${encodeURIComponent(
                     name
                   )}&searchType=image`
                 );
                 if (response.status === 429) {
                   let response = await fetch(
-                    `https://customsearch.googleapis.com/customsearch/v1?key=AIzaSyBQMvBehFDpwqhNc9_q-lIfPh8O2xdQ1Mc&cx=258e213112b4b4492&q=${encodeURIComponent(
+                    `https://customsearch.googleapis.com/customsearch/v1?key=AIzaSyAUOQzjNbBnGSBVvCZkWqHX7uebGZRY0lg&cx=258e213112b4b4492&q=${encodeURIComponent(
                       name
                     )}&searchType=image`
                   );

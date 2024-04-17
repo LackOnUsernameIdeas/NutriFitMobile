@@ -510,7 +510,7 @@ class MealPlanner extends React.Component {
           isLoading: true
         });
         // Key
-        const secret = process.env.EXPO_PUBLIC_OPENAI_API_KEY;
+        const secret = process.env.SECRET_OPEN;
         // Изпраща заявка към OpenAI API за генериране на план за хранене.
         const response = await fetch(
           "https://api.openai.com/v1/chat/completions",

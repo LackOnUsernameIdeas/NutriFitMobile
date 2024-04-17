@@ -35,7 +35,7 @@ class CustomAlert extends React.Component {
             </ScrollView>
             <TouchableOpacity onPress={onClose}>
               <View style={styles.button}>
-                <Text style={styles.buttonText}>Close</Text>
+                <Text style={styles.buttonText}>Затвори</Text>
               </View>
             </TouchableOpacity>
           </View>

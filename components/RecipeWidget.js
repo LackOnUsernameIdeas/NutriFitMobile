@@ -74,7 +74,7 @@ class RecipeWidget extends React.Component {
           </Block>
           <TouchableOpacity onPress={this.handleIngredientsPress}>
             <View style={styles.button}>
-              <Text style={styles.buttonText}>Покажи рецепта</Text>
+              <Text style={styles.buttonText}>Начин на приготвяне</Text>
             </View>
           </TouchableOpacity>
           <CustomAlert
